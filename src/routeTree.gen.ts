@@ -12,11 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JoinTokenRouteImport } from './routes/join.$token'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc/$'
+import { Route as ApiBoardEventsSplatRouteImport } from './routes/api/board-events/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthenticatedAppCalendarRouteImport } from './routes/_authenticated/app/calendar'
 import { Route as AuthenticatedAppBoardBoardIdRouteImport } from './routes/_authenticated/app/board.$boardId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -30,6 +33,11 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinTokenRoute = JoinTokenRouteImport.update({
+  id: '/join/$token',
+  path: '/join/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
@@ -52,11 +60,22 @@ const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBoardEventsSplatRoute = ApiBoardEventsSplatRouteImport.update({
+  id: '/api/board-events/$',
+  path: '/api/board-events/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppCalendarRoute =
+  AuthenticatedAppCalendarRouteImport.update({
+    id: '/app/calendar',
+    path: '/app/calendar',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAppBoardBoardIdRoute =
   AuthenticatedAppBoardBoardIdRouteImport.update({
     id: '/app/board/$boardId',
@@ -68,7 +87,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/join/$token': typeof JoinTokenRoute
+  '/app/calendar': typeof AuthenticatedAppCalendarRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/board-events/$': typeof ApiBoardEventsSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/board/$boardId': typeof AuthenticatedAppBoardBoardIdRoute
@@ -77,7 +99,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/join/$token': typeof JoinTokenRoute
+  '/app/calendar': typeof AuthenticatedAppCalendarRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/board-events/$': typeof ApiBoardEventsSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/board/$boardId': typeof AuthenticatedAppBoardBoardIdRoute
@@ -89,7 +114,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
+  '/join/$token': typeof JoinTokenRoute
+  '/_authenticated/app/calendar': typeof AuthenticatedAppCalendarRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/board-events/$': typeof ApiBoardEventsSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/board/$boardId': typeof AuthenticatedAppBoardBoardIdRoute
@@ -100,7 +128,10 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/join/$token'
+    | '/app/calendar'
     | '/api/auth/$'
+    | '/api/board-events/$'
     | '/api/rpc/$'
     | '/app/'
     | '/app/board/$boardId'
@@ -109,7 +140,10 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/join/$token'
+    | '/app/calendar'
     | '/api/auth/$'
+    | '/api/board-events/$'
     | '/api/rpc/$'
     | '/app'
     | '/app/board/$boardId'
@@ -120,7 +154,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_auth/login'
     | '/_auth/register'
+    | '/join/$token'
+    | '/_authenticated/app/calendar'
     | '/api/auth/$'
+    | '/api/board-events/$'
     | '/api/rpc/$'
     | '/_authenticated/app/'
     | '/_authenticated/app/board/$boardId'
@@ -130,7 +167,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  JoinTokenRoute: typeof JoinTokenRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiBoardEventsSplatRoute: typeof ApiBoardEventsSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
 }
 
@@ -155,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join/$token': {
+      id: '/join/$token'
+      path: '/join/$token'
+      fullPath: '/join/$token'
+      preLoaderRoute: typeof JoinTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/register': {
@@ -185,12 +231,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiRpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/board-events/$': {
+      id: '/api/board-events/$'
+      path: '/api/board-events/$'
+      fullPath: '/api/board-events/$'
+      preLoaderRoute: typeof ApiBoardEventsSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app/calendar': {
+      id: '/_authenticated/app/calendar'
+      path: '/app/calendar'
+      fullPath: '/app/calendar'
+      preLoaderRoute: typeof AuthenticatedAppCalendarRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/app/board/$boardId': {
       id: '/_authenticated/app/board/$boardId'
@@ -215,11 +275,13 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAppCalendarRoute: typeof AuthenticatedAppCalendarRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppBoardBoardIdRoute: typeof AuthenticatedAppBoardBoardIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAppCalendarRoute: AuthenticatedAppCalendarRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppBoardBoardIdRoute: AuthenticatedAppBoardBoardIdRoute,
 }
@@ -232,7 +294,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  JoinTokenRoute: JoinTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiBoardEventsSplatRoute: ApiBoardEventsSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
 }
 export const routeTree = rootRouteImport

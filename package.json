@@ -55,7 +55,8 @@
     "tailwind-merge": "latest",
     "tailwindcss": "latest",
     "vite": "latest",
-    "zod": "latest"
+    "zod": "latest",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@types/bun": "latest",

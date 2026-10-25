@@ -8,6 +8,34 @@
       "when": 1779402704066,
       "tag": "0000_lowly_cable",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779923092347,
+      "tag": "0001_misty_skaar",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779923801255,
+      "tag": "0002_warm_nocturne",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780000000000,
+      "tag": "0003_formula_column",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791936000000,
+      "tag": "0004_location_column",
+      "breakpoints": true
     }
   ]
 }

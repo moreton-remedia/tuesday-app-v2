@@ -1,9 +1,9 @@
 import { ORPCError } from '@orpc/client';
 import { os } from '@orpc/server';
+import { and, eq } from 'drizzle-orm';
 import { auth } from '@/common/auth';
 import { database } from '@/database/database';
-import { workspaceMemberTable, workspaceTable } from '@/database/schema';
-import { eq } from 'drizzle-orm';
+import { workspaceMemberTable, workspaceTable, userPreferencesTable } from '@/database/schema';
 
 export type UserSession = {
   session: { id: string; userId: string; impersonatedBy?: string | null };
@@ -43,16 +43,41 @@ const requireAuthMiddleware = o.middleware(async ({ context, next }) => {
   return next({ context: { userSession: context.userSession } });
 });
 
-// Resolve the user's workspace (first membership found)
+// Resolve the user's active workspace, falling back to first membership
 const workspaceMiddleware = o.middleware(async ({ context, next }) => {
   if (!context.userSession) return next({ context: { workspace: null } });
-  const [membership] = await database
+
+  const userId = context.userSession.user.id;
+
+  // Check if user has an active workspace preference
+  const [pref] = await database
+    .select()
+    .from(userPreferencesTable)
+    .where(eq(userPreferencesTable.userId, userId));
+
+  if (pref?.activeWorkspaceId) {
+    const [row] = await database
+      .select({ workspace: workspaceTable })
+      .from(workspaceMemberTable)
+      .innerJoin(workspaceTable, eq(workspaceMemberTable.workspaceId, workspaceTable.id))
+      .where(
+        and(
+          eq(workspaceMemberTable.userId, userId),
+          eq(workspaceMemberTable.workspaceId, pref.activeWorkspaceId),
+        ),
+      );
+    if (row) return next({ context: { workspace: row.workspace } });
+  }
+
+  // Fall back to first membership
+  const [row] = await database
     .select({ workspace: workspaceTable })
     .from(workspaceMemberTable)
     .innerJoin(workspaceTable, eq(workspaceMemberTable.workspaceId, workspaceTable.id))
-    .where(eq(workspaceMemberTable.userId, context.userSession.user.id))
+    .where(eq(workspaceMemberTable.userId, userId))
     .limit(1);
-  return next({ context: { workspace: membership?.workspace ?? null } });
+
+  return next({ context: { workspace: row?.workspace ?? null } });
 });
 
 const requireWorkspaceMiddleware = o.middleware(async ({ context, next }) => {
@@ -64,5 +89,7 @@ const requireWorkspaceMiddleware = o.middleware(async ({ context, next }) => {
 
 export const pub = o.use(authMiddleware);
 export const authed = pub.use(requireAuthMiddleware);
-export const workspaceScoped = authed.use(workspaceMiddleware).use(requireWorkspaceMiddleware);
+// Active workspace resolved but not required (workspace may be null for new users)
+export const workspaceOptional = authed.use(workspaceMiddleware);
+export const workspaceScoped = workspaceOptional.use(requireWorkspaceMiddleware);
 export { database };

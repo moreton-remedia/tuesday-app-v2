@@ -1,36 +1,50 @@
-import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { orpcUtils, orpcClient } from '@/rpc/react';
 import { signOut, useSession } from '@/common/auth-client';
 import { useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
+import { Sidebar } from '@/components/board/Sidebar';
 
 export const Route = createFileRoute('/_authenticated/app/')({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(orpcUtils.workspace.getWorkspace.queryOptions({ input: {} }));
+    await Promise.allSettled([
+      context.queryClient.prefetchQuery(orpcUtils.workspace.getWorkspace.queryOptions({ input: {} })),
+      context.queryClient.prefetchQuery(orpcUtils.workspace.listWorkspaces.queryOptions({ input: {} })),
+    ]);
   },
   component: AppPage,
 });
 
 function AppPage() {
   const { data: workspace } = useSuspenseQuery(orpcUtils.workspace.getWorkspace.queryOptions({ input: {} }));
+  const { data: workspaces } = useSuspenseQuery(orpcUtils.workspace.listWorkspaces.queryOptions({ input: {} }));
   const session = useSession();
   const router = useRouter();
-  const qc = useQueryClient();
 
   async function handleSignOut() {
     await signOut();
     await router.navigate({ to: '/login' });
   }
 
-  if (!workspace) return <WorkspaceSetup />;
+  // No workspaces at all — show first-time setup
+  if (!workspace || !workspaces?.length) return <WorkspaceSetup />;
 
-  return <WorkspaceHome workspaceId={workspace.id} workspaceName={workspace.name} userName={session.data?.user.name ?? ''} onSignOut={handleSignOut} />;
+  return (
+    <WorkspaceHome
+      workspace={workspace}
+      workspaces={workspaces}
+      userName={session.data?.user.name ?? ''}
+      onSignOut={handleSignOut}
+    />
+  );
 }
 
+// First-time setup (only shown when user has zero workspaces)
 function WorkspaceSetup() {
   const qc = useQueryClient();
   const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
+  const [inviteInput, setInviteInput] = useState('');
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,11 +63,17 @@ function WorkspaceSetup() {
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError('');
+    const token = inviteInput.trim().split('/join/').pop()?.trim() ?? '';
+    if (!token) {
+      setError('Please paste a valid invite link.');
+      setLoading(false);
+      return;
+    }
     try {
-      await orpcClient.workspace.joinWorkspace({ slug });
+      await orpcClient.workspace.joinWorkspaceByToken({ token });
       await qc.invalidateQueries();
     } catch (err: any) {
-      setError(err?.message ?? 'Workspace not found.');
+      setError(err?.message ?? 'Invite link is invalid or has expired.');
     } finally { setLoading(false); }
   }
 
@@ -81,8 +101,16 @@ function WorkspaceSetup() {
           ) : (
             <form onSubmit={handleJoin} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Workspace slug</label>
-                <input type="text" value={slug} onChange={e => setSlug(e.target.value)} required placeholder="e.g. acme-corp" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500" />
+                <label className="block text-sm text-gray-400 mb-1">Invite link</label>
+                <input
+                  type="text"
+                  value={inviteInput}
+                  onChange={e => setInviteInput(e.target.value)}
+                  required
+                  placeholder="Paste your invite link here"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500"
+                />
+                <p className="text-xs text-gray-600 mt-1">Ask your workspace owner for an invite link.</p>
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <button type="submit" disabled={loading} className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-medium py-2 rounded-lg text-sm transition-colors">{loading ? 'Joining…' : 'Join workspace'}</button>
@@ -94,58 +122,30 @@ function WorkspaceSetup() {
   );
 }
 
-import { useState } from 'react';
-
-function WorkspaceHome({ workspaceId, workspaceName, userName, onSignOut }: { workspaceId: string; workspaceName: string; userName: string; onSignOut: () => void }) {
+function WorkspaceHome({
+  workspace,
+  workspaces,
+  userName,
+  onSignOut,
+}: {
+  workspace: { id: string; name: string; inviteToken: string };
+  workspaces: { workspace: { id: string; name: string }; role: string }[];
+  userName: string;
+  onSignOut: () => void;
+}) {
   const { data: boards } = useSuspenseQuery(orpcUtils.board.listBoards.queryOptions({ input: {} }));
-  const qc = useQueryClient();
-  const [creating, setCreating] = useState(false);
-
-  async function handleCreateBoard() {
-    setCreating(true);
-    try {
-      const board = await orpcClient.board.createBoard({ name: 'New Board' });
-      await qc.invalidateQueries();
-    } finally { setCreating(false); }
-  }
 
   return (
-    <div className="flex min-h-screen bg-gray-950">
-      {/* Sidebar */}
-      <aside className="w-56 bg-gray-900 border-r border-gray-800 flex flex-col">
-        <div className="px-4 py-5 border-b border-gray-800">
-          <h1 className="text-lg font-bold text-white">Tuesday</h1>
-          <p className="text-xs text-gray-500 mt-0.5">{workspaceName}</p>
-        </div>
-        <nav className="flex-1 p-2 overflow-y-auto">
-          <p className="text-xs text-gray-500 font-semibold px-2 py-1 uppercase tracking-wider">Boards</p>
-          {boards?.map(board => (
-            <Link
-              key={board.id}
-              to="/app/board/$boardId"
-              params={{ boardId: board.id }}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors [&.active]:bg-gray-800 [&.active]:text-white"
-            >
-              <span className="w-2 h-2 rounded-sm bg-violet-500 flex-shrink-0" />
-              {board.name}
-            </Link>
-          ))}
-          <button
-            onClick={handleCreateBoard}
-            disabled={creating}
-            className="mt-1 flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-gray-500 hover:text-gray-300 hover:bg-gray-800 w-full text-left transition-colors"
-          >
-            <span className="text-lg leading-none">+</span>
-            Add board
-          </button>
-        </nav>
-        <div className="p-4 border-t border-gray-800">
-          <p className="text-xs text-gray-400 truncate mb-2">{userName}</p>
-          <button onClick={onSignOut} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Sign out</button>
-        </div>
-      </aside>
-
-      {/* Main */}
+    <div className="flex h-screen bg-gray-950 overflow-hidden">
+      <Sidebar
+        boards={boards ?? []}
+        workspaces={workspaces}
+        activeWorkspaceId={workspace.id}
+        inviteToken={workspace.inviteToken}
+        workspaceName={workspace.name}
+        userName={userName}
+        onSignOut={onSignOut}
+      />
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center text-gray-600">
           <p className="text-lg">Select a board from the sidebar</p>

@@ -4,11 +4,22 @@ import { z } from 'zod';
 import { database, workspaceScoped } from '@/rpc/base';
 import { automationTable, boardTable } from '@/database/schema';
 import { nanoid } from '@/lib/utils';
+import { broadcastBoardUpdate } from '@/lib/board-events';
 
 const triggerSchema = z.object({
-  type: z.enum(['status-changes-to', 'dropdown-changes-to']),
+  type: z.enum(['status-changes-to', 'dropdown-changes-to', 'text-contains', 'link-changes']),
   colId: z.string(),
   value: z.string(),
+  automationName: z.string().optional(),
+  linkedColId: z.string().optional(),
+  linkedValue: z.string().optional(),
+  linkedOp: z.enum(['eq', 'contains']).optional(),
+  extraConditions: z.array(z.object({
+    colId: z.string(),
+    value: z.string(),
+    op: z.enum(['eq', 'contains']).optional(),
+    connector: z.enum(['and', 'or']).optional(),
+  })).optional(),
   scope: z.enum(['any', 'all']).optional(),
 });
 
@@ -47,6 +58,7 @@ export const createAutomation = workspaceScoped
       trigger: input.trigger,
       actions: input.actions,
     }).returning();
+    broadcastBoardUpdate(input.boardId);
     return auto;
   });
 
@@ -64,12 +76,16 @@ export const updateAutomation = workspaceScoped
     if (input.actions !== undefined) patch.actions = input.actions;
     const [auto] = await database.update(automationTable).set(patch).where(eq(automationTable.id, input.automationId)).returning();
     if (!auto) throw new ORPCError('NOT_FOUND', { message: 'Automation not found.' });
+    broadcastBoardUpdate(auto.boardId);
     return auto;
   });
 
 export const deleteAutomation = workspaceScoped
   .input(z.object({ automationId: z.string() }))
   .handler(async ({ input }) => {
+    const [auto] = await database.select({ boardId: automationTable.boardId })
+      .from(automationTable).where(eq(automationTable.id, input.automationId));
     await database.delete(automationTable).where(eq(automationTable.id, input.automationId));
+    if (auto?.boardId) broadcastBoardUpdate(auto.boardId);
     return { success: true };
   });

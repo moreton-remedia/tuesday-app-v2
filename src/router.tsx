@@ -20,6 +20,10 @@ export function getRouter() {
           toast.error(error instanceof Error ? error.message : 'An error occurred');
         },
       },
+      dehydrate: {
+        // Only dehydrate successful queries; errored SSR queries get re-fetched client-side
+        shouldDehydrateQuery: (query) => query.state.status === 'success',
+      },
     },
   });
 

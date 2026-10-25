@@ -5,7 +5,7 @@ export const ColumnScopes = ['task', 'subitem'] as const;
 export const columnScopeEnum = pgEnum('column_scope', ColumnScopes);
 export type ColumnScope = (typeof ColumnScopes)[number];
 
-export const ColumnTypes = ['notes', 'dropdown', 'date', 'status', 'link'] as const;
+export const ColumnTypes = ['notes', 'dropdown', 'date', 'status', 'link', 'formula', 'location'] as const;
 export const columnTypeEnum = pgEnum('column_type', ColumnTypes);
 export type ColumnType = (typeof ColumnTypes)[number];
 
@@ -26,6 +26,8 @@ export const columnTable = pgTable('column', {
   sourceBoardId: text('source_board_id'),
   linkedTaskId: text('linked_task_id'),
   importCols: jsonb('import_cols').$type<string[]>().default([]),
+  // For formula columns
+  formula: text('formula'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tuesday-dev",
+      "runtimeExecutable": "C:\\Users\\jo-ba\\.bun\\bin\\bun.exe",
+      "runtimeArgs": ["x", "--bun", "vite", "dev"],
+      "port": 3000
+    }
+  ]
+}
