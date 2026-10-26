@@ -456,28 +456,26 @@ function loadMapsScript(onReady: () => void) {
   const s = document.createElement('script');
   s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&v=weekly&loading=async`;
   s.async = true;
-  s.onload = () => {
-    _mapsReady = true;
-    _mapsLoading = false;
-    _mapsCallbacks.splice(0).forEach(cb => cb());
-  };
-  s.onerror = () => {
-    _mapsLoading = false;
-    _mapsCallbacks.length = 0;
-    console.error('[Maps] Failed to load Google Maps script. Check API key and enabled APIs.');
-  };
+  s.onload = () => { _mapsReady = true; _mapsLoading = false; _mapsCallbacks.splice(0).forEach(cb => cb()); };
+  s.onerror = () => { _mapsLoading = false; _mapsCallbacks.length = 0; };
   document.head.appendChild(s);
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MapsSuggestion = { placePrediction: { text: { text: string }; toPlace: () => any } };
 
 function LocationCell({ value, onChange, onSetTaskName }: { value: string; onChange: (v: string) => void; onSetTaskName?: (name: string) => void }) {
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [draft, setDraft] = useState('');
+  const [suggestions, setSuggestions] = useState<MapsSuggestion[]>([]);
   const triggerRef = useRef<HTMLDivElement>(null);
-  const textInputRef = useRef<HTMLInputElement>(null);
-  const autocompleteContainerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sessionTokenRef = useRef<any>(null);
 
   function open() {
     setDraft(value);
+    setSuggestions([]);
     setAnchorRect(triggerRef.current?.getBoundingClientRect() ?? null);
   }
 
@@ -485,48 +483,42 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
     const v = draft.trim();
     if (v !== value) onChange(v);
     setAnchorRect(null);
+    setSuggestions([]);
+    sessionTokenRef.current = null;
+  }
+
+  async function fetchSuggestions(text: string) {
+    if (!text.trim() || !MAPS_API_KEY) { setSuggestions([]); return; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const g = (window as any).google;
+    if (!g?.maps?.importLibrary) { setSuggestions([]); return; }
+    try {
+      const { AutocompleteSuggestion, AutocompleteSessionToken } = await g.maps.importLibrary('places');
+      if (!sessionTokenRef.current) sessionTokenRef.current = new AutocompleteSessionToken();
+      const result = await AutocompleteSuggestion.fetchAutocompleteSuggestions({ input: text, sessionToken: sessionTokenRef.current });
+      setSuggestions(result.suggestions ?? []);
+    } catch { setSuggestions([]); }
+  }
+
+  function handleInput(text: string) {
+    setDraft(text);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchSuggestions(text), 300);
+  }
+
+  async function selectSuggestion(s: MapsSuggestion) {
+    const place = s.placePrediction.toPlace();
+    await place.fetchFields({ fields: ['formattedAddress'] });
+    const addr: string = place.formattedAddress ?? '';
+    if (addr) { onChange(addr); }
+    setSuggestions([]);
+    setAnchorRect(null);
+    sessionTokenRef.current = null;
   }
 
   useEffect(() => {
-    if (!anchorRect || !MAPS_API_KEY || !autocompleteContainerRef.current) return;
-
-    let placeElement: HTMLElement | null = null;
-    let mounted = true;
-
-    async function init() {
-      if (!mounted || !autocompleteContainerRef.current) return;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const g = (window as any).google;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { PlaceAutocompleteElement } = await g.maps.importLibrary('places') as any;
-      if (!mounted || !autocompleteContainerRef.current) return;
-      placeElement = new PlaceAutocompleteElement() as HTMLElement;
-      (placeElement as HTMLElement).style.width = '100%';
-      autocompleteContainerRef.current.appendChild(placeElement);
-      placeElement.addEventListener('gmp-placeselect', async (e: Event) => {
-        if (!mounted) return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const place = (e as any).place;
-        await place.fetchFields({ fields: ['formattedAddress'] });
-        if (place.formattedAddress) {
-          onChange(place.formattedAddress);
-          setAnchorRect(null);
-        }
-      });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).google?.maps?.importLibrary) {
-      init();
-    } else {
-      loadMapsScript(() => init());
-    }
-
-    return () => {
-      mounted = false;
-      if (placeElement?.parentNode) placeElement.parentNode.removeChild(placeElement);
-    };
-  }, [!!anchorRect]);
+    if (MAPS_API_KEY && !_mapsReady && !_mapsLoading) loadMapsScript(() => {});
+  }, []);
 
   return (
     <div className="w-full h-full">
@@ -549,32 +541,43 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
       {anchorRect && (
         <CellPopover anchorRect={anchorRect} onClose={close} width={300}>
           <div className="p-2">
-            {MAPS_API_KEY ? (
-              <div ref={autocompleteContainerRef} className="w-full" />
-            ) : (
-              <input
-                ref={textInputRef}
-                value={draft}
-                onChange={e => setDraft(e.target.value)}
-                autoFocus
-                placeholder="Enter an address…"
-                className="w-full bg-transparent text-sm text-white outline-none placeholder-gray-600 px-1 py-1"
-                onKeyDown={e => {
-                  if (e.key === 'Escape') setAnchorRect(null);
-                  if (e.key === 'Enter') close();
-                }}
-              />
+            <input
+              value={draft}
+              onChange={e => handleInput(e.target.value)}
+              autoFocus
+              placeholder={MAPS_API_KEY ? 'Search for an address…' : 'Enter an address…'}
+              className="w-full bg-transparent text-sm text-white outline-none placeholder-gray-600 px-1 py-1"
+              onKeyDown={e => {
+                if (e.key === 'Escape') setAnchorRect(null);
+                if (e.key === 'Enter') {
+                  if (suggestions.length > 0) selectSuggestion(suggestions[0]);
+                  else close();
+                }
+              }}
+            />
+            {suggestions.length > 0 && (
+              <div className="mt-1 border-t border-gray-700/60 pt-1">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => selectSuggestion(s)}
+                    className="w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-gray-700 rounded flex items-center gap-2"
+                  >
+                    <span className="text-gray-500 flex-shrink-0">
+                      <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    </span>
+                    <span className="truncate">{s.placePrediction.text.text}</span>
+                  </button>
+                ))}
+              </div>
             )}
-            {value && (
+            {value && suggestions.length === 0 && (
               <div className="mt-1 border-t border-gray-700/60 pt-1 space-y-0.5">
                 {onSetTaskName && (
                   <button
                     onMouseDown={e => e.preventDefault()}
-                    onClick={() => {
-                      const street = value.split(',')[0].trim();
-                      onSetTaskName(street);
-                      setAnchorRect(null);
-                    }}
+                    onClick={() => { const street = value.split(',')[0].trim(); onSetTaskName(street); setAnchorRect(null); }}
                     className="w-full text-left px-1 py-1 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded flex items-center gap-1.5"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
