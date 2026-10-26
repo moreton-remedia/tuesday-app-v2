@@ -454,7 +454,7 @@ function loadMapsScript(onReady: () => void) {
   if (_mapsLoading) return;
   _mapsLoading = true;
   const s = document.createElement('script');
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=places&v=weekly&loading=async`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&v=weekly&loading=async`;
   s.async = true;
   s.onload = () => {
     _mapsReady = true;
@@ -473,7 +473,8 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [draft, setDraft] = useState('');
   const triggerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
+  const autocompleteContainerRef = useRef<HTMLDivElement>(null);
 
   function open() {
     setDraft(value);
@@ -486,44 +487,44 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
     setAnchorRect(null);
   }
 
-  function closeDiscard() {
-    setAnchorRect(null);
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!anchorRect || !inputRef.current || !MAPS_API_KEY) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let ac: any = null;
+    if (!anchorRect || !MAPS_API_KEY || !autocompleteContainerRef.current) return;
 
-    function init() {
-      if (!inputRef.current) return;
+    let placeElement: HTMLElement | null = null;
+    let mounted = true;
+
+    async function init() {
+      if (!mounted || !autocompleteContainerRef.current) return;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const g = (window as any).google;
-      ac = new g.maps.places.Autocomplete(inputRef.current, { fields: ['formatted_address'] });
-      ac.addListener('place_changed', () => {
-        const place = ac.getPlace() as { formatted_address?: string };
-        if (place?.formatted_address) {
-          onChange(place.formatted_address);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { PlaceAutocompleteElement } = await g.maps.importLibrary('places') as any;
+      if (!mounted || !autocompleteContainerRef.current) return;
+      placeElement = new PlaceAutocompleteElement() as HTMLElement;
+      (placeElement as HTMLElement).style.width = '100%';
+      autocompleteContainerRef.current.appendChild(placeElement);
+      placeElement.addEventListener('gmp-placeselect', async (e: Event) => {
+        if (!mounted) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const place = (e as any).place;
+        await place.fetchFields({ fields: ['formattedAddress'] });
+        if (place.formattedAddress) {
+          onChange(place.formattedAddress);
           setAnchorRect(null);
         }
       });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).google?.maps?.places) {
+    if ((window as any).google?.maps?.importLibrary) {
       init();
     } else {
-      loadMapsScript(init);
+      loadMapsScript(() => init());
     }
 
     return () => {
-      if (ac) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (window as any).google.maps.event.clearInstanceListeners(ac);
-        } catch {}
-      }
+      mounted = false;
+      if (placeElement?.parentNode) placeElement.parentNode.removeChild(placeElement);
     };
   }, [!!anchorRect]);
 
@@ -548,18 +549,22 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
       {anchorRect && (
         <CellPopover anchorRect={anchorRect} onClose={close} width={300}>
           <div className="p-2">
-            <input
-              ref={inputRef}
-              value={draft}
-              onChange={e => setDraft(e.target.value)}
-              autoFocus
-              placeholder={MAPS_API_KEY ? 'Search for an address…' : 'Enter an address…'}
-              className="w-full bg-transparent text-sm text-white outline-none placeholder-gray-600 px-1 py-1"
-              onKeyDown={e => {
-                if (e.key === 'Escape') closeDiscard();
-                if (e.key === 'Enter') close();
-              }}
-            />
+            {MAPS_API_KEY ? (
+              <div ref={autocompleteContainerRef} className="w-full" />
+            ) : (
+              <input
+                ref={textInputRef}
+                value={draft}
+                onChange={e => setDraft(e.target.value)}
+                autoFocus
+                placeholder="Enter an address…"
+                className="w-full bg-transparent text-sm text-white outline-none placeholder-gray-600 px-1 py-1"
+                onKeyDown={e => {
+                  if (e.key === 'Escape') setAnchorRect(null);
+                  if (e.key === 'Enter') close();
+                }}
+              />
+            )}
             {value && (
               <div className="mt-1 border-t border-gray-700/60 pt-1 space-y-0.5">
                 {onSetTaskName && (
