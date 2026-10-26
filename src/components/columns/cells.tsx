@@ -454,12 +454,17 @@ function loadMapsScript(onReady: () => void) {
   if (_mapsLoading) return;
   _mapsLoading = true;
   const s = document.createElement('script');
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=places`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=places&v=weekly&loading=async`;
   s.async = true;
   s.onload = () => {
     _mapsReady = true;
     _mapsLoading = false;
     _mapsCallbacks.splice(0).forEach(cb => cb());
+  };
+  s.onerror = () => {
+    _mapsLoading = false;
+    _mapsCallbacks.length = 0;
+    console.error('[Maps] Failed to load Google Maps script. Check API key and enabled APIs.');
   };
   document.head.appendChild(s);
 }
