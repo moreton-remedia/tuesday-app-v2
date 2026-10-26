@@ -541,7 +541,7 @@ function NewEventModal({
                     {boardColumns.map(col => {
                       const visible = !hiddenSet.has(col.id);
                       const typeLabel: Record<string, string> = {
-                        notes: 'Notes', date: 'Date', dropdown: 'Dropdown', link: 'Link',
+                        notes: 'Notes', date: 'Date', dropdown: 'Dropdown', link: 'Link', location: 'Location',
                       };
                       return (
                         <label
@@ -830,7 +830,7 @@ function EventDetailModal({
                     <div className="space-y-1 bg-gray-800/50 rounded-lg p-2">
                       {boardColumns.map(col => {
                         const visible = !hiddenSet.has(col.id);
-                        const typeLabel: Record<string, string> = { notes: 'Notes', date: 'Date', dropdown: 'Dropdown', status: 'Status', link: 'Link' };
+                        const typeLabel: Record<string, string> = { notes: 'Notes', date: 'Date', dropdown: 'Dropdown', status: 'Status', link: 'Link', location: 'Location' };
                         return (
                           <label
                             key={col.id}
@@ -920,6 +920,12 @@ function EventDetailModal({
                             <span className="truncate">{resolveLinkedTaskName(raw)}</span>
                           </span>
                         )}
+                        {col.type === 'location' && raw && (
+                          <span className="text-xs text-gray-300 flex items-center gap-1">
+                            <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-gray-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            <span className="truncate">{raw}</span>
+                          </span>
+                        )}
                         {col.type === 'formula' && (
                           <span className="text-xs text-gray-400 font-mono">{raw}</span>
                         )}
@@ -971,6 +977,117 @@ function EventDetailModal({
   );
 }
 
+// ── Maps autocomplete for calendar ───────────────────────────────────────────
+
+const CAL_MAPS_KEY = (import.meta as { env?: Record<string, string> }).env?.VITE_GOOGLE_MAPS_API_KEY;
+
+let _calMapsReady = false;
+let _calMapsLoading = false;
+const _calMapsCallbacks: (() => void)[] = [];
+
+function loadCalMapsScript(onReady: () => void) {
+  if (_calMapsReady) { onReady(); return; }
+  _calMapsCallbacks.push(onReady);
+  if (_calMapsLoading) return;
+  _calMapsLoading = true;
+  const existing = document.querySelector('script[src*="maps.googleapis.com"]');
+  if (existing) {
+    // Script already loading from board page — wait for it
+    const check = setInterval(() => {
+      if ((window as any).google?.maps?.importLibrary) { // eslint-disable-line @typescript-eslint/no-explicit-any
+        clearInterval(check);
+        _calMapsReady = true;
+        _calMapsLoading = false;
+        _calMapsCallbacks.splice(0).forEach(cb => cb());
+      }
+    }, 100);
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${CAL_MAPS_KEY}&v=weekly&loading=async`;
+  s.async = true;
+  s.onload = () => { _calMapsReady = true; _calMapsLoading = false; _calMapsCallbacks.splice(0).forEach(cb => cb()); };
+  document.head.appendChild(s);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CalMapsSuggestion = { placePrediction: { text: { text: string }; toPlace: () => any } };
+
+function LocationField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [draft, setDraft] = useState(value);
+  const [suggestions, setSuggestions] = useState<CalMapsSuggestion[]>([]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sessionTokenRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (CAL_MAPS_KEY && !_calMapsReady && !_calMapsLoading) loadCalMapsScript(() => {});
+  }, []);
+
+  async function fetchSuggestions(text: string) {
+    if (!text.trim() || !CAL_MAPS_KEY) { setSuggestions([]); return; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const g = (window as any).google;
+    if (!g?.maps?.importLibrary) { setSuggestions([]); return; }
+    try {
+      const { AutocompleteSuggestion, AutocompleteSessionToken } = await g.maps.importLibrary('places');
+      if (!sessionTokenRef.current) sessionTokenRef.current = new AutocompleteSessionToken();
+      const result = await AutocompleteSuggestion.fetchAutocompleteSuggestions({ input: text, sessionToken: sessionTokenRef.current });
+      setSuggestions(result.suggestions ?? []);
+    } catch { setSuggestions([]); }
+  }
+
+  function handleInput(text: string) {
+    setDraft(text);
+    onChange(text);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchSuggestions(text), 300);
+  }
+
+  async function selectSuggestion(s: CalMapsSuggestion) {
+    const place = s.placePrediction.toPlace();
+    await place.fetchFields({ fields: ['formattedAddress'] });
+    const addr: string = place.formattedAddress ?? '';
+    if (addr) { setDraft(addr); onChange(addr); }
+    setSuggestions([]);
+    sessionTokenRef.current = null;
+  }
+
+  return (
+    <div className="relative">
+      <input
+        value={draft}
+        onChange={e => handleInput(e.target.value)}
+        placeholder={CAL_MAPS_KEY ? 'Search for an address…' : 'Enter an address…'}
+        className="w-full bg-gray-800 border border-gray-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 outline-none transition-colors"
+        onKeyDown={e => {
+          if (e.key === 'Enter' && suggestions.length > 0) { e.preventDefault(); selectSuggestion(suggestions[0]); }
+          if (e.key === 'Escape') setSuggestions([]);
+        }}
+        onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+      />
+      {suggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 z-10 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+          {suggestions.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => selectSuggestion(s)}
+              className="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+            >
+              <span className="text-gray-500 flex-shrink-0">
+                <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </span>
+              <span className="truncate">{s.placePrediction.text.text}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Column field — renders the right input for each column type ───────────────
 
 function ColumnField({ col, value, onChange }: { col: CalColumn; value: string; onChange: (v: string) => void }) {
@@ -1015,6 +1132,9 @@ function ColumnField({ col, value, onChange }: { col: CalColumn; value: string; 
       )}
       {col.type === 'link' && (
         <LinkColumnField col={col} value={value} onChange={onChange} />
+      )}
+      {col.type === 'location' && (
+        <LocationField value={value} onChange={onChange} />
       )}
     </div>
   );
