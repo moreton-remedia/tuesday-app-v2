@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: tuesday-app
+    runtime: node
+    buildCommand: npm install -g bun && bun install && bun run build
+    startCommand: bun run migrate.ts && bun run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PORT
+        value: 3000
+      - key: BASE_URL
+        fromService:
+          type: web
+          name: tuesday-app
+          property: host
+      - key: TRUSTED_ORIGINS
+        fromService:
+          type: web
+          name: tuesday-app
+          property: host
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: VITE_GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: APP_NAME
+        value: Tuesday
+      - key: PRETTY_LOGGING
+        value: false
+      - key: DATABASE_DEBUG
+        value: false
