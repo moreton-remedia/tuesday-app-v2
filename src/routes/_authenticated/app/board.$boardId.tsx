@@ -222,6 +222,7 @@ function GroupList({ data, boardId }: { data: BoardData; boardId: string }) {
               columns={taskColumns}
               subitemColumns={subitemColumns}
               boardId={boardId}
+              allBoardTasks={data.tasks}
               isDragging={dragIdx === i}
               onGroupDragStart={e => handleDragStart(e, i)}
             />

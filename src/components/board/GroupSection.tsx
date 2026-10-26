@@ -23,11 +23,12 @@ interface GroupSectionProps {
   columns: Column[];
   subitemColumns: Column[];
   boardId: string;
+  allBoardTasks?: Task[];
   isDragging?: boolean;
   onGroupDragStart?: (e: React.DragEvent) => void;
 }
 
-export function GroupSection({ group, tasks, subitems = [], columns = [], subitemColumns = [], boardId, isDragging, onGroupDragStart }: GroupSectionProps) {
+export function GroupSection({ group, tasks, subitems = [], columns = [], subitemColumns = [], boardId, allBoardTasks, isDragging, onGroupDragStart }: GroupSectionProps) {
   const qc = useQueryClient();
   const [collapsed, setCollapsed] = useState(group.collapsed === 1);
   const [pendingFocusId, setPendingFocusId] = useState<string | null>(null);
@@ -161,6 +162,7 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
           columns={columns}
           subitemColumns={subitemColumns}
           boardId={boardId}
+          allBoardTasks={allBoardTasks}
           pendingFocusId={pendingFocusId}
           handleFocused={handleFocused}
           handleAddTask={handleAddTask}
@@ -185,6 +187,7 @@ interface GroupTaskTableProps {
   columns: Column[];
   subitemColumns: Column[];
   boardId: string;
+  allBoardTasks?: Task[];
   pendingFocusId: string | null;
   handleFocused: () => void;
   handleAddTask: () => void;
@@ -196,7 +199,7 @@ interface GroupTaskTableProps {
 }
 
 function GroupTaskTable({
-  group, tasks, subitems, columns, subitemColumns, boardId,
+  group, tasks, subitems, columns, subitemColumns, boardId, allBoardTasks,
   pendingFocusId, handleFocused, handleAddTask,
   addColBtnRef, showColPicker, setShowColPicker, colPickerRect, setColPickerRect,
 }: GroupTaskTableProps) {
@@ -376,6 +379,7 @@ function GroupTaskTable({
               subitems={subitems.filter(s => s.taskId === task.id)}
               subitemColumns={subitemColumns}
               boardId={boardId}
+              allBoardTasks={allBoardTasks}
               groupColor={group.color}
               autoFocus={task.id === pendingFocusId}
               onFocused={handleFocused}
@@ -407,6 +411,7 @@ interface TaskRowProps {
   columns: Column[];
   subitems: Subitem[];
   subitemColumns: Column[];
+  allBoardTasks?: Task[];
   boardId: string;
   groupColor: string;
   autoFocus?: boolean;
@@ -420,7 +425,7 @@ interface TaskRowProps {
   onDragEnd?: () => void;
 }
 
-function TaskRow({ task, columns, subitems, subitemColumns, boardId, groupColor, autoFocus, onFocused,
+function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTasks, groupColor, autoFocus, onFocused,
   isDragging, isDragTarget, onDragStart, onDragOver, onDragLeave, onDrop, onDragEnd,
 }: TaskRowProps) {
   const qc = useQueryClient();
@@ -429,6 +434,8 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, groupColor,
   const isExpanded = task.expanded === 1;
   const { toggleTask, isTaskSelected } = useSelectionStore();
   const selected = isTaskSelected(task.id);
+  const [duplicateOf, setDuplicateOf] = useState<Task | null>(null);
+  const pendingNameRef = useRef<string | null>(null);
 
   function invalidate() {
     qc.invalidateQueries(orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }));
@@ -449,10 +456,29 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, groupColor,
 
   function handleNameChange(name: string) {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    pendingNameRef.current = name;
     saveTimerRef.current = setTimeout(async () => {
+      const trimmed = name.trim();
+      if (trimmed && allBoardTasks) {
+        const dup = allBoardTasks.find(t => t.id !== task.id && (t.name ?? '').trim().toLowerCase() === trimmed.toLowerCase());
+        if (dup) { setDuplicateOf(dup); return; }
+      }
       await orpcClient.task.updateTask({ taskId: task.id, name });
       invalidate();
     }, 500);
+  }
+
+  async function handleCreateAnyway() {
+    const name = pendingNameRef.current ?? (inputRef.current?.value ?? '');
+    setDuplicateOf(null);
+    await orpcClient.task.updateTask({ taskId: task.id, name });
+    invalidate();
+  }
+
+  async function handleUseExisting() {
+    setDuplicateOf(null);
+    await orpcClient.task.deleteTask({ taskId: task.id });
+    invalidate();
   }
 
   async function handleFieldChange(colId: string, value: string) {
@@ -589,6 +615,31 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, groupColor,
             />
           </td>
         </tr>
+      )}
+      {duplicateOf && createPortal(
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-xs bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl mx-4 p-5">
+            <h3 className="text-sm font-semibold text-white mb-1">Duplicate task name</h3>
+            <p className="text-xs text-gray-400 mb-4">
+              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleUseExisting}
+                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+              >
+                Delete new, keep existing
+              </button>
+              <button
+                onClick={handleCreateAnyway}
+                className="flex-1 px-3 py-2 text-xs font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Create as new
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
       )}
     </>
   );

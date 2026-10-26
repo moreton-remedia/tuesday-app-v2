@@ -385,6 +385,7 @@ function NewEventModal({
   const [fields, setFields] = useState<Record<string, string>>({});
   const [creating, setCreating] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
+  const [duplicateOf, setDuplicateOf] = useState<{ id: string; name: string } | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
 
   // Per-board hidden column IDs — persisted in localStorage
@@ -473,9 +474,9 @@ function NewEventModal({
 
   const canCreate = name.trim().length > 0 && !!groupId;
 
-  async function handleCreate() {
-    if (!canCreate || creating) return;
+  async function doCreate() {
     setCreating(true);
+    setDuplicateOf(null);
     try {
       const task = await orpcClient.task.createTask({ groupId, name: name.trim() });
       if (task) {
@@ -490,6 +491,17 @@ function NewEventModal({
     } catch {
       setCreating(false);
     }
+  }
+
+  async function handleCreate() {
+    if (!canCreate || creating) return;
+    const trimmed = name.trim();
+    const groupBoardMap = calData?.groupBoardMap ?? {};
+    const dup = (calData?.tasks ?? []).find(
+      t => groupBoardMap[t.groupId] === boardId && (t.name ?? '').trim().toLowerCase() === trimmed.toLowerCase(),
+    );
+    if (dup) { setDuplicateOf({ id: dup.id, name: dup.name ?? '' }); return; }
+    await doCreate();
   }
 
   return createPortal(
@@ -670,22 +682,45 @@ function NewEventModal({
           })()}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-800 flex-shrink-0">
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 text-sm text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleCreate}
-            disabled={!canCreate || creating}
-            className="px-4 py-1.5 text-sm font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-          >
-            {creating ? 'Creating…' : 'Create task'}
-          </button>
-        </div>
+        {/* Footer — duplicate prompt or normal actions */}
+        {duplicateOf ? (
+          <div className="px-5 py-4 border-t border-gray-800 flex-shrink-0 space-y-2">
+            <p className="text-xs text-gray-400">
+              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDuplicateOf(null)}
+                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+              >
+                ← Back
+              </button>
+              <button
+                onClick={doCreate}
+                disabled={creating}
+                className="flex-1 px-3 py-1.5 text-xs font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white rounded-lg transition-colors"
+              >
+                {creating ? 'Creating…' : 'Create anyway'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-800 flex-shrink-0">
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 text-sm text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCreate}
+              disabled={!canCreate || creating}
+              className="px-4 py-1.5 text-sm font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+            >
+              {creating ? 'Creating…' : 'Create task'}
+            </button>
+          </div>
+        )}
       </div>
     </div>,
     document.body,
