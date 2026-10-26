@@ -508,7 +508,22 @@ function NewEventModal({
         <div className="overflow-y-auto px-5 pb-2 space-y-3 flex-1">
           {/* Task name */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Task name <span className="text-violet-500">*</span></label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500">Task name <span className="text-violet-500">*</span></label>
+              {(() => {
+                const locCol = orderedBoardColumns.find(c => c.type === 'location' && fields[c.id]);
+                const locVal = locCol ? fields[locCol.id] : '';
+                return locVal && locVal !== name ? (
+                  <button
+                    type="button"
+                    onClick={() => setName(locVal)}
+                    className="text-[10px] text-violet-400 hover:text-violet-300 transition-colors"
+                  >
+                    ← Use address as title
+                  </button>
+                ) : null;
+              })()}
+            </div>
             <input
               ref={nameRef}
               value={name}
