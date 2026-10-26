@@ -354,6 +354,16 @@ function CalendarView({
 
 type CalColumn = NonNullable<CalData>['columns'][number];
 
+function applyColOrder(cols: CalColumn[], boardId: string, order: Record<string, string[]>): CalColumn[] {
+  const ids = order[boardId];
+  if (!ids || ids.length === 0) return cols;
+  const map = new Map(cols.map(c => [c.id, c]));
+  const ordered = ids.map(id => map.get(id)).filter(Boolean) as CalColumn[];
+  const inOrder = new Set(ids);
+  cols.forEach(c => { if (!inOrder.has(c.id)) ordered.push(c); });
+  return ordered;
+}
+
 function NewEventModal({
   initialDate,
   boards,
@@ -385,12 +395,39 @@ function NewEventModal({
     } catch { return {}; }
   });
 
+  // Per-board column order — persisted in localStorage
+  const [colOrder, setColOrder] = useState<Record<string, string[]>>(() => {
+    try {
+      const raw = localStorage.getItem('calendar-col-order');
+      return raw ? (JSON.parse(raw) as Record<string, string[]>) : {};
+    } catch { return {}; }
+  });
+
+  const dragColRef = useRef<string | null>(null);
+
   function toggleCol(colId: string) {
     setHiddenCols(prev => {
       const current = new Set(prev[boardId] ?? []);
       current.has(colId) ? current.delete(colId) : current.add(colId);
       const next = { ...prev, [boardId]: [...current] };
       try { localStorage.setItem('calendar-col-visibility', JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+
+  function reorderCol(targetColId: string, ordered: CalColumn[]) {
+    const fromId = dragColRef.current;
+    if (!fromId || fromId === targetColId) return;
+    const ids = ordered.map(c => c.id);
+    const fromIdx = ids.indexOf(fromId);
+    const toIdx = ids.indexOf(targetColId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const newIds = [...ids];
+    newIds.splice(fromIdx, 1);
+    newIds.splice(toIdx, 0, fromId);
+    setColOrder(prev => {
+      const next = { ...prev, [boardId]: newIds };
+      try { localStorage.setItem('calendar-col-order', JSON.stringify(next)); } catch {}
       return next;
     });
   }
@@ -405,6 +442,11 @@ function NewEventModal({
   const boardColumns = useMemo<CalColumn[]>(
     () => allColumns.filter(c => c.boardId === boardId && c.type !== 'formula' && c.type !== 'status'),
     [allColumns, boardId],
+  );
+
+  const orderedBoardColumns = useMemo(
+    () => applyColOrder(boardColumns, boardId, colOrder),
+    [boardColumns, boardId, colOrder],
   );
 
   // When board changes: reset groupId, fields, and close customize panel
@@ -508,9 +550,12 @@ function NewEventModal({
           )}
 
           {/* ── Per-column fields ── */}
-          {boardColumns.length > 0 && (() => {
+          {orderedBoardColumns.length > 0 && (() => {
             const hiddenSet = new Set(hiddenCols[boardId] ?? []);
-            const visibleCols = boardColumns.filter(c => !hiddenSet.has(c.id));
+            const visibleCols = orderedBoardColumns.filter(c => !hiddenSet.has(c.id));
+            const typeLabel: Record<string, string> = {
+              notes: 'Notes', date: 'Date', dropdown: 'Dropdown', link: 'Link', location: 'Location',
+            };
             return (
               <div className="border-t border-gray-800 pt-3">
                 {/* Section header */}
@@ -536,20 +581,28 @@ function NewEventModal({
                 </div>
 
                 {showCustomize ? (
-                  /* ── Customize mode: checkboxes for all eligible columns ── */
+                  /* ── Customize mode: drag-to-reorder + visibility toggles ── */
                   <div className="space-y-1 bg-gray-800/50 rounded-lg p-2">
-                    {boardColumns.map(col => {
+                    {orderedBoardColumns.map(col => {
                       const visible = !hiddenSet.has(col.id);
-                      const typeLabel: Record<string, string> = {
-                        notes: 'Notes', date: 'Date', dropdown: 'Dropdown', link: 'Link', location: 'Location',
-                      };
                       return (
-                        <label
+                        <div
                           key={col.id}
-                          className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-gray-800 cursor-pointer group"
+                          draggable
+                          onDragStart={() => { dragColRef.current = col.id; }}
+                          onDragOver={e => e.preventDefault()}
+                          onDrop={() => reorderCol(col.id, orderedBoardColumns)}
+                          className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-gray-800 group"
                         >
+                          <span className="cursor-grab text-gray-700 group-hover:text-gray-500 flex-shrink-0" title="Drag to reorder">
+                            <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor">
+                              <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
+                              <circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/>
+                              <circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/>
+                            </svg>
+                          </span>
                           <span
-                            className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors"
+                            className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors cursor-pointer"
                             style={{
                               backgroundColor: visible ? '#7c3aed' : 'transparent',
                               borderColor: visible ? '#7c3aed' : '#4b5563',
@@ -563,7 +616,7 @@ function NewEventModal({
                             )}
                           </span>
                           <span
-                            className={`text-xs flex-1 transition-colors ${visible ? 'text-gray-200' : 'text-gray-600'}`}
+                            className={`text-xs flex-1 transition-colors cursor-pointer ${visible ? 'text-gray-200' : 'text-gray-600'}`}
                             onClick={() => toggleCol(col.id)}
                           >
                             {col.label}
@@ -571,7 +624,7 @@ function NewEventModal({
                           <span className="text-[10px] text-gray-700 group-hover:text-gray-600 flex-shrink-0">
                             {typeLabel[col.type] ?? col.type}
                           </span>
-                        </label>
+                        </div>
                       );
                     })}
                   </div>
@@ -585,7 +638,7 @@ function NewEventModal({
                     All columns hidden — click <span className="text-violet-500">Customize</span> to show some
                   </button>
                 ) : (
-                  /* ── Normal mode: visible column inputs ── */
+                  /* ── Normal mode: visible column inputs in saved order ── */
                   <div className="space-y-3">
                     {visibleCols.map(col => (
                       <ColumnField
@@ -677,6 +730,16 @@ function EventDetailModal({
     } catch { return {}; }
   });
 
+  // Per-board column order — shared with NewEventModal via same localStorage key
+  const [colOrder, setColOrder] = useState<Record<string, string[]>>(() => {
+    try {
+      const raw = localStorage.getItem('calendar-col-order');
+      return raw ? (JSON.parse(raw) as Record<string, string[]>) : {};
+    } catch { return {}; }
+  });
+
+  const dragColRef = useRef<string | null>(null);
+
   function toggleCol(colId: string) {
     setHiddenCols(prev => {
       const current = new Set(prev[event.boardId] ?? []);
@@ -686,6 +749,28 @@ function EventDetailModal({
       return next;
     });
   }
+
+  function reorderCol(targetColId: string, ordered: CalColumn[]) {
+    const fromId = dragColRef.current;
+    if (!fromId || fromId === targetColId) return;
+    const ids = ordered.map(c => c.id);
+    const fromIdx = ids.indexOf(fromId);
+    const toIdx = ids.indexOf(targetColId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const newIds = [...ids];
+    newIds.splice(fromIdx, 1);
+    newIds.splice(toIdx, 0, fromId);
+    setColOrder(prev => {
+      const next = { ...prev, [event.boardId]: newIds };
+      try { localStorage.setItem('calendar-col-order', JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+
+  const orderedBoardColumns = useMemo(
+    () => applyColOrder(boardColumns, event.boardId, colOrder),
+    [boardColumns, event.boardId, colOrder],
+  );
 
   // Escape closes
   useEffect(() => {
@@ -738,7 +823,7 @@ function EventDetailModal({
   );
 
   const hiddenSet = new Set(hiddenCols[event.boardId] ?? []);
-  const visibleEditCols = boardColumns.filter(c => !hiddenSet.has(c.id));
+  const visibleEditCols = orderedBoardColumns.filter(c => !hiddenSet.has(c.id));
 
   return createPortal(
     <div
@@ -808,7 +893,7 @@ function EventDetailModal({
               )}
 
               {/* Column fields */}
-              {boardColumns.length > 0 && (
+              {orderedBoardColumns.length > 0 && (
                 <div className="border-t border-gray-800 pt-3">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Column details</span>
@@ -828,32 +913,45 @@ function EventDetailModal({
 
                   {showCustomize ? (
                     <div className="space-y-1 bg-gray-800/50 rounded-lg p-2">
-                      {boardColumns.map(col => {
-                        const visible = !hiddenSet.has(col.id);
+                      {(() => {
                         const typeLabel: Record<string, string> = { notes: 'Notes', date: 'Date', dropdown: 'Dropdown', status: 'Status', link: 'Link', location: 'Location' };
-                        return (
-                          <label
-                            key={col.id}
-                            className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-gray-800 cursor-pointer group"
-                          >
-                            <span
-                              className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors"
-                              style={{ backgroundColor: visible ? '#7c3aed' : 'transparent', borderColor: visible ? '#7c3aed' : '#4b5563' }}
-                              onClick={() => toggleCol(col.id)}
+                        return orderedBoardColumns.map(col => {
+                          const visible = !hiddenSet.has(col.id);
+                          return (
+                            <div
+                              key={col.id}
+                              draggable
+                              onDragStart={() => { dragColRef.current = col.id; }}
+                              onDragOver={e => e.preventDefault()}
+                              onDrop={() => reorderCol(col.id, orderedBoardColumns)}
+                              className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-gray-800 group"
                             >
-                              {visible && (
-                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M1 4l2 2 4-4" />
+                              <span className="cursor-grab text-gray-700 group-hover:text-gray-500 flex-shrink-0" title="Drag to reorder">
+                                <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor">
+                                  <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
+                                  <circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/>
+                                  <circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/>
                                 </svg>
-                              )}
-                            </span>
-                            <span className={`text-xs flex-1 transition-colors ${visible ? 'text-gray-200' : 'text-gray-600'}`} onClick={() => toggleCol(col.id)}>
-                              {col.label}
-                            </span>
-                            <span className="text-[10px] text-gray-700 flex-shrink-0">{typeLabel[col.type] ?? col.type}</span>
-                          </label>
-                        );
-                      })}
+                              </span>
+                              <span
+                                className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors cursor-pointer"
+                                style={{ backgroundColor: visible ? '#7c3aed' : 'transparent', borderColor: visible ? '#7c3aed' : '#4b5563' }}
+                                onClick={() => toggleCol(col.id)}
+                              >
+                                {visible && (
+                                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M1 4l2 2 4-4" />
+                                  </svg>
+                                )}
+                              </span>
+                              <span className={`text-xs flex-1 transition-colors cursor-pointer ${visible ? 'text-gray-200' : 'text-gray-600'}`} onClick={() => toggleCol(col.id)}>
+                                {col.label}
+                              </span>
+                              <span className="text-[10px] text-gray-700 flex-shrink-0">{typeLabel[col.type] ?? col.type}</span>
+                            </div>
+                          );
+                        });
+                      })()}
                     </div>
                   ) : visibleEditCols.length === 0 ? (
                     <button type="button" onClick={() => setShowCustomize(true)} className="w-full text-xs text-gray-700 hover:text-gray-500 transition-colors py-2 text-center">
