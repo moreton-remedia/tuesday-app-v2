@@ -77,10 +77,10 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
   }
 
   return (
-    <div className={`rounded-xl overflow-hidden border border-gray-800/55 shadow-sm ${isDragging ? 'opacity-40' : ''}`}>
+    <div className={`rounded-xl overflow-hidden border border-app-ln bg-app-s1 shadow-sm ${isDragging ? 'opacity-40' : ''}`}>
       {/* Group header */}
       <div
-        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900/70 group/grphdr"
+        className="flex items-center gap-2 px-4 py-2.5 bg-app-s2 group/grphdr"
         style={{ borderLeft: `4px solid ${group.color}` }}
       >
         {/* Drag handle */}
@@ -94,7 +94,7 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
         </span>
         <button
           onClick={handleToggleCollapse}
-          className="text-gray-500 hover:text-gray-300 transition-colors text-[10px] w-4 h-4 flex items-center justify-center flex-shrink-0"
+          className="text-app-t3 hover:text-app-t1 transition-colors text-[10px] w-4 h-4 flex items-center justify-center flex-shrink-0"
           aria-label={collapsed ? 'Expand group' : 'Collapse group'}
         >
           {collapsed
@@ -115,14 +115,14 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
         <EditableField
           value={group.title}
           onSave={handleUpdateGroupTitle}
-          className="flex-1 text-sm font-semibold text-white bg-transparent outline-none min-w-0"
+          className="flex-1 text-sm font-semibold text-app-t1 bg-transparent outline-none min-w-0"
         />
-        <span className="text-xs text-gray-500 flex-shrink-0">
+        <span className="text-xs text-app-t3 flex-shrink-0">
           {tasks.length} task{tasks.length !== 1 ? 's' : ''}
         </span>
         <button
           onClick={handleDeleteGroup}
-          className="text-gray-600 hover:text-red-400 transition-colors text-base leading-none flex-shrink-0 px-1"
+          className="text-app-t3 hover:text-app-dg transition-colors text-base leading-none flex-shrink-0 px-1"
           aria-label="Delete group"
         >
           ×
@@ -133,10 +133,10 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
         <>
           <div className="fixed inset-0 z-[100]" onMouseDown={() => setShowColorPicker(false)} />
           <div
-            className="fixed z-[101] bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-3"
+            className="fixed z-[101] bg-app-s2 border border-app-ln rounded-xl shadow-xl p-3"
             style={{ top: colorPickerRect.bottom + 6, left: colorPickerRect.left - 4 }}
           >
-            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Group color</p>
+            <p className="text-[10px] font-semibold text-app-t3 uppercase tracking-wider mb-2">Group color</p>
             <div className="flex gap-1.5 flex-wrap" style={{ width: 168 }}>
               {PALETTE.map(({ key, hex }) => (
                 <button
@@ -302,14 +302,14 @@ function GroupTaskTable({
     <div className="overflow-x-auto">
       <table className="border-collapse table-fixed w-full min-w-full">
         <thead>
-          <tr className="border-b border-gray-700/50 bg-gray-800/60">
+          <tr className="border-b border-app-ln bg-app-s2">
             <th className="px-3 py-2" style={{ width: 40 }}>
               <button
                 onClick={() => selectAllTasks(taskIds, boardId)}
                 className={`w-4 h-4 rounded border-2 transition-colors flex items-center justify-center ${
-                  allSelected ? 'bg-violet-600 border-violet-600' :
-                  someSelected ? 'border-violet-600 bg-transparent' :
-                  'border-gray-700 hover:border-gray-500'
+                  allSelected ? 'bg-app-ac border-app-ac' :
+                  someSelected ? 'border-app-ac bg-transparent' :
+                  'border-app-ln hover:border-app-t3'
                 }`}
                 aria-label="Select all tasks in group"
               >
@@ -318,7 +318,7 @@ function GroupTaskTable({
               </button>
             </th>
             <th
-              className="relative px-3 py-2 text-left text-[12px] text-gray-500 font-medium border-r border-gray-700/50 select-none"
+              className="relative px-3 py-2 text-left text-[12px] text-app-t3 font-medium border-r border-app-ln select-none"
               style={{ width: taskNameWidth }}
             >
               Task name
@@ -346,14 +346,14 @@ function GroupTaskTable({
                 onDragEnd={onColDragEnd}
               />
             ))}
-            <th className="px-2 py-2 border-l border-gray-700">
+            <th className="px-2 py-2 border-l border-app-ln">
               <button
                 ref={addColBtnRef}
                 onClick={() => {
                   setColPickerRect(addColBtnRef.current?.getBoundingClientRect() ?? null);
                   setShowColPicker(s => !s);
                 }}
-                className="text-gray-600 hover:text-gray-300 text-sm leading-none w-5 h-5 flex items-center justify-center rounded hover:bg-gray-700 transition-colors"
+                className="text-app-t3 hover:text-app-t1 text-sm leading-none w-5 h-5 flex items-center justify-center rounded hover:bg-app-ln transition-colors"
                 title="Add column"
               >
                 +
@@ -396,7 +396,7 @@ function GroupTaskTable({
       </table>
       <button
         onClick={handleAddTask}
-        className="w-full text-left px-[46px] py-2 text-sm text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 transition-colors border-t border-gray-800/50"
+        className="w-full text-left px-[46px] py-2 text-[13px] text-app-t3 hover:text-app-t2 hover:bg-app-s2 transition-colors border-t border-app-ln-s"
       >
         + Add task
       </button>
@@ -513,11 +513,11 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         onDragEnd={onDragEnd}
-        className={`group/row border-b border-gray-800/50 transition-colors ${
+        className={`group/row border-b border-app-ln-s transition-colors ${
           isDragging ? 'opacity-40' :
-          isDragTarget ? 'bg-violet-900/20' :
-          selected ? 'bg-violet-950/30' :
-          'hover:bg-gray-800/30'
+          isDragTarget ? 'bg-app-ac-lt' :
+          selected ? 'bg-app-ac-lt' :
+          'hover:bg-app-s2'
         }`}
       >
         {/* Grip handle + selection checkbox */}
@@ -527,8 +527,8 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
             onClick={() => toggleTask(task.id, boardId)}
             className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${
               selected
-                ? 'bg-violet-600 border-violet-600 opacity-100'
-                : 'border-gray-600 opacity-0 group-hover/row:opacity-100'
+                ? 'bg-app-ac border-app-ac opacity-100'
+                : 'border-app-ln opacity-0 group-hover/row:opacity-100'
             }`}
             aria-label={selected ? 'Deselect task' : 'Select task'}
           >
@@ -564,11 +564,11 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
                   handleDelete();
                 }
               }}
-              className="bg-transparent text-sm flex-1 min-w-0 outline-none placeholder-gray-600 text-white"
+              className="bg-transparent text-sm flex-1 min-w-0 outline-none placeholder:text-app-t3 text-app-t1"
               placeholder="Task name"
             />
             {subitems.length > 0 && (
-              <span className="flex-shrink-0 text-[10px] font-medium text-gray-500 bg-gray-800 rounded px-1.5 py-0.5 tabular-nums leading-none">
+              <span className="flex-shrink-0 text-[10px] font-medium text-app-t3 bg-app-s3 rounded px-1.5 py-0.5 tabular-nums leading-none">
                 {subitems.length}
               </span>
             )}
@@ -577,7 +577,7 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
 
         {/* Custom column cells */}
         {columns.map((col, colIdx) => (
-          <td key={col.id} className={`border-l p-0 ${colIdx === 0 ? 'border-gray-700' : 'border-gray-800/50'}`}>
+          <td key={col.id} className={`border-l p-0 ${colIdx === 0 ? 'border-app-ln' : 'border-app-ln-s'}`}>
             <CellRenderer
               col={col}
               value={task.fields?.[col.id] ?? ''}
@@ -590,13 +590,13 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
         ))}
 
         {/* Add col spacer */}
-        <td className="px-2 py-2 border-l border-gray-700" />
+        <td className="px-2 py-2 border-l border-app-ln" />
 
         {/* Delete */}
         <td className="px-2 py-2 w-8">
           <button
             onClick={handleDelete}
-            className="text-gray-700 hover:text-red-400 transition-colors opacity-0 group-hover/row:opacity-100 text-base leading-none"
+            className="text-app-t3 hover:text-app-dg transition-colors opacity-0 group-hover/row:opacity-100 text-base leading-none"
             aria-label="Delete task"
           >
             ×
@@ -623,21 +623,21 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
           className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm"
           onMouseDown={e => { if (e.target === e.currentTarget) handleUseExisting(); }}
         >
-          <div className="w-full max-w-xs bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl mx-4 p-5">
-            <h3 className="text-sm font-semibold text-white mb-1">Duplicate task name</h3>
-            <p className="text-xs text-gray-400 mb-4">
-              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board. Click away to cancel.
+          <div className="w-full max-w-xs bg-app-s1 border border-app-ln rounded-2xl shadow-2xl mx-4 p-5">
+            <h3 className="text-sm font-semibold text-app-t1 mb-1">Duplicate task name</h3>
+            <p className="text-xs text-app-t2 mb-4">
+              A task named <span className="text-app-t1 font-medium">"{duplicateOf.name}"</span> already exists in this board. Click away to cancel.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={handleUseExisting}
-                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="flex-1 px-3 py-2 text-xs font-medium text-app-t1 bg-app-s3 hover:bg-app-ln rounded-lg transition-colors"
               >
                 Update Old
               </button>
               <button
                 onClick={handleCreateAnyway}
-                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+                className="flex-1 px-3 py-2 text-xs font-medium text-app-ac-tx bg-app-ac hover:opacity-90 rounded-lg transition-colors"
               >
                 Create New
               </button>

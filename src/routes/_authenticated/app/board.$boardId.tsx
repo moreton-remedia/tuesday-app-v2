@@ -105,7 +105,7 @@ function BoardPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
+    <div className="flex h-screen bg-app-bg overflow-hidden">
       <Sidebar
         boards={boards ?? []}
         workspaces={workspaces ?? []}
@@ -117,16 +117,16 @@ function BoardPage() {
       />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Board header */}
-        <div className="border-b border-gray-800/50 px-6 py-4 bg-gray-950 flex items-center gap-3 flex-shrink-0">
+        <div className="border-b border-app-ln px-6 py-4 bg-app-bg flex items-center gap-3 flex-shrink-0">
           <BoardNameInput key={boardId} value={data.board.name} onSave={handleUpdateBoardName} />
           <button
             onClick={() => setShowAutomations(true)}
-            className="ml-auto flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-800/60"
+            className="ml-auto flex items-center gap-1.5 text-[13px] text-app-t3 hover:text-app-t1 px-3 py-1.5 rounded-lg hover:bg-app-ln-s"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span>Automations</span>
             {data.automations.length > 0 && (
-              <span className="bg-violet-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+              <span className="bg-app-ac text-app-ac-tx text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                 {data.automations.length}
               </span>
             )}
@@ -134,13 +134,13 @@ function BoardPage() {
         </div>
 
         {/* Groups */}
-        <div className="flex-1 overflow-auto p-6 space-y-5">
+        <div className="flex-1 overflow-auto p-6 space-y-4">
           <GroupList data={data} boardId={boardId} />
           <button
             onClick={handleAddGroup}
-            className="flex items-center gap-2 text-[13px] hover:text-gray-300 transition-colors py-1.5 px-2.5 rounded-lg hover:bg-gray-800/40" style={{ color: 'oklch(0.48 0.016 268)' }}
+            className="flex items-center gap-2 text-[13px] text-app-t3 hover:text-app-t2 py-1.5 px-2.5 rounded-lg hover:bg-app-ln-s"
           >
-            <span className="text-base leading-none">+</span>
+            <span className="text-base leading-none font-light">+</span>
             Add group
           </button>
         </div>
@@ -213,7 +213,7 @@ function GroupList({ data, boardId }: { data: BoardData; boardId: string }) {
             onDragLeave={() => setDragOver(null)}
             onDrop={e => handleDrop(e, i)}
             onDragEnd={handleDragEnd}
-            className={dragOver === i && dragIdx !== i ? 'ring-2 ring-violet-500 rounded-lg' : undefined}
+            className={dragOver === i && dragIdx !== i ? 'ring-2 ring-app-ac rounded-xl' : undefined}
           >
             <GroupSection
               group={group}
@@ -261,7 +261,7 @@ function BoardNameInput({ value, onSave }: { value: string; onSave: (v: string) 
           e.currentTarget.blur();
         }
       }}
-      className="text-xl font-semibold bg-transparent outline-none min-w-0 flex-1 max-w-lg" style={{ color: 'oklch(0.91 0.008 265)' }}
+      className="text-xl font-semibold bg-transparent outline-none min-w-0 flex-1 max-w-lg text-app-t1 placeholder:text-app-t3"
       aria-label="Board name"
     />
   );

@@ -1,95 +1,140 @@
 @import 'tailwindcss' source('../');
 @import 'shadcn/tailwind.css';
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark, .dark *));
 
-/* ── Design token overrides ── */
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-}
-
-/* Warm purple-slate gray scale — replaces cold industrial grays */
-@theme {
-  --color-gray-950: oklch(0.110 0.024 282);
-  --color-gray-900: oklch(0.152 0.028 278);
-  --color-gray-800: oklch(0.202 0.030 275);
-  --color-gray-700: oklch(0.278 0.026 272);
-  --color-gray-600: oklch(0.395 0.022 270);
-  --color-gray-500: oklch(0.535 0.018 268);
-  --color-gray-400: oklch(0.668 0.014 265);
-  --color-gray-300: oklch(0.795 0.010 262);
-  --color-gray-200: oklch(0.882 0.007 260);
-  --color-gray-100: oklch(0.936 0.005 258);
-  --color-gray-50:  oklch(0.972 0.003 256);
-
-  /* Softer violet — less neon, more lilac */
-  --color-violet-700: oklch(0.47 0.200 290);
-  --color-violet-600: oklch(0.56 0.210 288);
-  --color-violet-500: oklch(0.64 0.215 285);
-  --color-violet-400: oklch(0.72 0.193 282);
-  --color-violet-300: oklch(0.80 0.158 280);
-  --color-violet-200: oklch(0.88 0.108 278);
-  --color-violet-100: oklch(0.94 0.060 276);
-  --color-violet-50:  oklch(0.97 0.030 274);
-}
-
+/* ── Design tokens — light theme ──────────────────────────────── */
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.98 0.005 90);
-  --foreground: oklch(0.20 0.01 90);
-  --muted: oklch(0.94 0.006 90);
-  --muted-foreground: oklch(0.46 0.01 90);
-  --border: oklch(0.88 0.008 90);
-  --primary: oklch(0.34 0.05 170);
-  --primary-foreground: oklch(0.97 0.006 170);
+
+  /* Structure */
+  --c-bg:    oklch(0.972 0.007 80);     /* warm off-white page */
+  --c-sb:    oklch(0.932 0.016 278);    /* sidebar: faint lavender-stone */
+  --c-sb-b:  oklch(0.878 0.014 276);   /* sidebar right border */
+
+  /* Surfaces (cards, panels) */
+  --c-s1:    oklch(1.000 0.000   0);   /* white card */
+  --c-s2:    oklch(0.964 0.009  80);   /* elevated surface */
+  --c-s3:    oklch(0.935 0.012  78);   /* more elevated */
+
+  /* Lines */
+  --c-ln:    oklch(0.878 0.013  75);   /* standard border */
+  --c-ln-s:  oklch(0.920 0.010  78);   /* subtle border / hover bg */
+
+  /* Text */
+  --c-t1:    oklch(0.218 0.022  62);   /* primary — warm near-black */
+  --c-t2:    oklch(0.490 0.018  68);   /* secondary */
+  --c-t3:    oklch(0.660 0.014  68);   /* muted */
+
+  /* Accent */
+  --c-ac:    oklch(0.560 0.220 286);   /* violet */
+  --c-ac-lt: oklch(0.560 0.220 286 / 0.10);
+  --c-ac-tx: oklch(1.000 0.000   0);
+
+  /* Danger */
+  --c-dg:    oklch(0.612 0.200  25);
+  --c-dg-lt: oklch(0.612 0.200  25 / 0.10);
+
+  /* Shadcn compatibility */
+  --background:          oklch(0.972 0.007 80);
+  --foreground:          oklch(0.218 0.022 62);
+  --muted:               oklch(0.935 0.012 78);
+  --muted-foreground:    oklch(0.660 0.014 68);
+  --border:              oklch(0.878 0.013 75);
+  --primary:             oklch(0.560 0.220 286);
+  --primary-foreground:  oklch(1.000 0.000 0);
 }
 
-/* ── Global base styles ── */
+/* ── Design tokens — dark theme ───────────────────────────────── */
+.dark {
+  --c-bg:    oklch(0.150 0.018 274);
+  --c-sb:    oklch(0.128 0.016 277);
+  --c-sb-b:  oklch(0.258 0.020 275);
+
+  --c-s1:    oklch(0.192 0.022 274);
+  --c-s2:    oklch(0.228 0.022 272);
+  --c-s3:    oklch(0.264 0.021 270);
+
+  --c-ln:    oklch(0.285 0.020 272);
+  --c-ln-s:  oklch(0.234 0.018 274);
+
+  --c-t1:    oklch(0.940 0.008 264);
+  --c-t2:    oklch(0.635 0.016 268);
+  --c-t3:    oklch(0.420 0.018 270);
+
+  --c-ac:    oklch(0.644 0.215 284);
+  --c-ac-lt: oklch(0.644 0.215 284 / 0.14);
+  --c-ac-tx: oklch(1.000 0.000   0);
+
+  --c-dg:    oklch(0.678 0.195  25);
+  --c-dg-lt: oklch(0.678 0.195  25 / 0.12);
+
+  --background:          oklch(0.150 0.018 274);
+  --foreground:          oklch(0.940 0.008 264);
+  --muted:               oklch(0.264 0.021 270);
+  --muted-foreground:    oklch(0.420 0.018 270);
+  --border:              oklch(0.285 0.020 272);
+  --primary:             oklch(0.644 0.215 284);
+  --primary-foreground:  oklch(1.000 0.000 0);
+}
+
+/* ── Tailwind utility registration ────────────────────────────── */
+@theme inline {
+  --radius-sm:               calc(var(--radius) - 4px);
+  --radius-md:               calc(var(--radius) - 2px);
+  --radius-lg:               var(--radius);
+
+  /* shadcn utilities */
+  --color-background:        var(--background);
+  --color-foreground:        var(--foreground);
+  --color-muted:             var(--muted);
+  --color-muted-foreground:  var(--muted-foreground);
+  --color-border:            var(--border);
+  --color-primary:           var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* semantic app utilities: bg-app-*, text-app-*, border-app-* */
+  --color-app-bg:    var(--c-bg);
+  --color-app-sb:    var(--c-sb);
+  --color-app-s1:    var(--c-s1);
+  --color-app-s2:    var(--c-s2);
+  --color-app-s3:    var(--c-s3);
+  --color-app-ln:    var(--c-ln);
+  --color-app-ln-s:  var(--c-ln-s);
+  --color-app-t1:    var(--c-t1);
+  --color-app-t2:    var(--c-t2);
+  --color-app-t3:    var(--c-t3);
+  --color-app-ac:    var(--c-ac);
+  --color-app-ac-lt: var(--c-ac-lt);
+  --color-app-ac-tx: var(--c-ac-tx);
+  --color-app-dg:    var(--c-dg);
+  --color-app-dg-lt: var(--c-dg-lt);
+}
+
+/* ── Global base ──────────────────────────────────────────────── */
+html            { color-scheme: light; }
+html.dark       { color-scheme: dark; }
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  background-color: var(--c-bg);
+  color: var(--c-t1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Smooth micro-transitions on interactive elements */
 button, a, input, select, textarea {
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease,
+              color 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
 }
 
-/* Softer custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: oklch(0.30 0.020 278 / 0.5);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.40 0.022 275 / 0.7);
-}
+::-webkit-scrollbar            { width: 5px; height: 5px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: var(--c-ln); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-t3); }
 
-/* Softer focus rings */
 *:focus-visible {
-  outline: 2px solid oklch(0.64 0.215 285 / 0.6);
+  outline: 2px solid color-mix(in oklch, var(--c-ac) 55%, transparent);
   outline-offset: 2px;
-}
-
-/* Task row hover — soft glow rather than block colour change */
-.task-row-hover:hover {
-  background: oklch(0.202 0.030 275 / 0.6);
+  border-radius: 3px;
 }
