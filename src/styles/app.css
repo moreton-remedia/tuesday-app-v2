@@ -9,8 +9,8 @@
 
   /* Structure */
   --c-bg:    oklch(0.972 0.007 80);     /* warm off-white page */
-  --c-sb:    oklch(0.932 0.016 278);    /* sidebar: faint lavender-stone */
-  --c-sb-b:  oklch(0.878 0.014 276);   /* sidebar right border */
+  --c-sb:    oklch(0.932 0.012  90);    /* sidebar: warm cream-sage */
+  --c-sb-b:  oklch(0.878 0.013  85);   /* sidebar right border */
 
   /* Surfaces (cards, panels) */
   --c-s1:    oklch(1.000 0.000   0);   /* white card */
@@ -27,8 +27,8 @@
   --c-t3:    oklch(0.660 0.014  68);   /* muted */
 
   /* Accent */
-  --c-ac:    oklch(0.560 0.220 286);   /* violet */
-  --c-ac-lt: oklch(0.560 0.220 286 / 0.10);
+  --c-ac:    oklch(0.470 0.115 142);   /* sage green — matches company logo */
+  --c-ac-lt: oklch(0.470 0.115 142 / 0.10);
   --c-ac-tx: oklch(1.000 0.000   0);
 
   /* Danger */
@@ -41,7 +41,7 @@
   --muted:               oklch(0.935 0.012 78);
   --muted-foreground:    oklch(0.660 0.014 68);
   --border:              oklch(0.878 0.013 75);
-  --primary:             oklch(0.560 0.220 286);
+  --primary:             oklch(0.470 0.115 142);
   --primary-foreground:  oklch(1.000 0.000 0);
 }
 
