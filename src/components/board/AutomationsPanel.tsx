@@ -51,7 +51,9 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
 
   const triggerCols = columns.filter(c => c.type === 'status' || c.type === 'dropdown' || c.type === 'notes' || c.type === 'link');
 
-  return createPortal(
+  return (
+    <>
+      {createPortal(
     <>
       <div className="fixed inset-0 z-[200] bg-black/40" onMouseDown={onClose} />
       <div className="fixed right-0 top-0 bottom-0 z-[201] w-96 bg-app-s1 border-l border-app-ln flex flex-col shadow-2xl">
@@ -68,7 +70,7 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {automations.length === 0 && !editing && (
+          {automations.length === 0 && (
             <p className="text-sm text-app-t3 text-center py-8">No automations yet. Add one to get started.</p>
           )}
 
@@ -85,32 +87,66 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
               onDuplicate={() => handleDuplicate(auto)}
             />
           ))}
-
-          {editing && (
-            <AutomationEditor
-              automation={editing === 'new' ? null : editing}
-              boardId={boardId}
-              columns={triggerCols}
-              allColumns={columns}
-              groups={groups}
-              allBoards={allBoards}
-              onSave={() => { setEditing(null); invalidate(); }}
-              onCancel={() => setEditing(null)}
-            />
-          )}
         </div>
 
         {/* Footer */}
-        {!editing && (
-          <div className="px-4 pb-4">
-            <button
-              onClick={() => setEditing('new')}
-              className="w-full bg-app-ac hover:bg-app-ac/90 text-app-ac-tx text-sm font-medium py-2 rounded-lg transition-colors"
-            >
-              + Add automation
-            </button>
-          </div>
-        )}
+        <div className="px-4 pb-4">
+          <button
+            onClick={() => setEditing('new')}
+            className="w-full bg-app-ac hover:bg-app-ac/90 text-app-ac-tx text-sm font-medium py-2 rounded-lg transition-colors"
+          >
+            + Add automation
+          </button>
+        </div>
+      </div>
+    </>,
+    document.body,
+      )}
+      <AutomationEditorModal
+        editing={editing}
+        boardId={boardId}
+        triggerCols={triggerCols}
+        columns={columns}
+        groups={groups}
+        allBoards={allBoards}
+        onSave={() => { setEditing(null); invalidate(); }}
+        onCancel={() => setEditing(null)}
+      />
+    </>
+  );
+}
+
+// ── AutomationEditorModal ─────────────────────────────────────────────────────
+
+function AutomationEditorModal({
+  editing, boardId, triggerCols, columns, groups, allBoards, onSave, onCancel,
+}: {
+  editing: Automation | 'new' | null;
+  boardId: string;
+  triggerCols: Column[];
+  columns: Column[];
+  groups: Group[];
+  allBoards: Board[];
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  if (!editing) return null;
+  return createPortal(
+    <>
+      <div className="fixed inset-0 z-[300] bg-black/50" onMouseDown={onCancel} />
+      <div className="fixed inset-0 z-[301] flex items-center justify-center pointer-events-none">
+        <div className="w-full max-w-md mx-4 pointer-events-auto max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+          <AutomationEditor
+            automation={editing === 'new' ? null : editing}
+            boardId={boardId}
+            columns={triggerCols}
+            allColumns={columns}
+            groups={groups}
+            allBoards={allBoards}
+            onSave={onSave}
+            onCancel={onCancel}
+          />
+        </div>
       </div>
     </>,
     document.body,
