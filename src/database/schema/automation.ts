@@ -15,7 +15,16 @@ export type AutomationTrigger = {
    *  `connector` says how this condition joins the previous one:
    *  'and' → same group (both must match), 'or' → new group (either group matches).
    *  Groups are then combined with `scope` (any = some group, all = every group). */
-  extraConditions?: Array<{ colId: string; value: string; op?: 'eq' | 'contains'; connector?: 'and' | 'or' }>;
+  extraConditions?: Array<{
+    colId: string;
+    value: string;
+    op?: 'eq' | 'contains';
+    connector?: 'and' | 'or';
+    /** For link-column extra conditions */
+    linkedColId?: string;
+    linkedValue?: string;
+    linkedOp?: 'eq' | 'contains';
+  }>;
   scope?: 'any' | 'all';
 };
 

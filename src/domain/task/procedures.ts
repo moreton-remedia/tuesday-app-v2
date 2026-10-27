@@ -240,10 +240,26 @@ async function evaluateTrigger(
   }
 
   // status-changes-to / dropdown-changes-to / text-contains
-  type Cond = { colId: string; value: string; op: 'eq' | 'contains' };
+  type Cond = {
+    colId: string; value: string; op: 'eq' | 'contains';
+    linkedColId?: string; linkedValue?: string; linkedOp?: 'eq' | 'contains';
+  };
   const scope = trigger.scope ?? 'all';
 
-  const evalCond = (c: Cond) => {
+  const evalCond = async (c: Cond): Promise<boolean> => {
+    if (c.linkedColId !== undefined) {
+      // Link-column extra condition: look up the linked task's field value
+      const linkedTaskId = fields[c.colId];
+      if (!linkedTaskId) return false;
+      const [linkedTask] = await database.select({ fields: taskTable.fields })
+        .from(taskTable).where(eq(taskTable.id, linkedTaskId));
+      if (!linkedTask) return false;
+      const linkedFields = (linkedTask.fields as Record<string, string> | null) ?? {};
+      const fieldVal = linkedFields[c.linkedColId] ?? '';
+      return (c.linkedOp ?? 'eq') === 'contains'
+        ? fieldVal.toLowerCase().includes((c.linkedValue ?? '').toLowerCase())
+        : fieldVal === (c.linkedValue ?? '');
+    }
     const fieldVal = fields[c.colId] ?? '';
     return c.op === 'contains'
       ? fieldVal.toLowerCase().includes(c.value.toLowerCase())
@@ -262,6 +278,9 @@ async function evaluateTrigger(
     op: (c.op ?? 'eq') as 'eq' | 'contains',
     // Default connector falls back to scope for automations saved before per-condition connectors
     connector: (c.connector ?? (scope === 'any' ? 'or' : 'and')) as 'and' | 'or',
+    linkedColId: c.linkedColId,
+    linkedValue: c.linkedValue,
+    linkedOp: c.linkedOp,
   }));
 
   if (extras.length === 0) return evalCond(primary);
@@ -283,8 +302,11 @@ async function evaluateTrigger(
     }
   }
 
-  const evalGroup = (group: Cond[]) => group.every(evalCond);
-  return groups.some(evalGroup);
+  for (const group of groups) {
+    const results = await Promise.all(group.map(evalCond));
+    if (results.every(Boolean)) return true;
+  }
+  return false;
 }
 
 /**

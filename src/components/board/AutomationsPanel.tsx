@@ -255,6 +255,24 @@ function AutomationCard({
         ?? '…')
     : null;
 
+  // For extra conditions with link columns: fetch the source board to resolve linked col labels.
+  const extraConditions = auto.trigger.extraConditions ?? [];
+  const firstExtraLinkCol = (() => {
+    for (const cond of extraConditions) {
+      if (cond.linkedColId !== undefined) {
+        const col = columns.find(c => c.id === cond.colId);
+        if (col?.sourceBoardId) return col;
+      }
+    }
+    return null;
+  })();
+  const { data: extraSrcBoardData } = useQuery({
+    ...orpcUtils.board.getBoardData.queryOptions({
+      input: { boardId: firstExtraLinkCol?.sourceBoardId ?? '' },
+    }),
+    enabled: !!firstExtraLinkCol?.sourceBoardId,
+  });
+
   function describeAction(action: AutomationAction) {
     switch (action.type) {
       case 'set-status':
@@ -283,7 +301,6 @@ function AutomationCard({
     }
   }
 
-  const extraConditions = auto.trigger.extraConditions ?? [];
   const scope = auto.trigger.scope ?? 'all';
 
   return (
@@ -337,6 +354,23 @@ function AutomationCard({
               const connLabel = cond.connector
                 ? (cond.connector === 'or' ? 'Or' : 'And')
                 : (scope === 'any' ? 'Or' : 'And');
+              if (cond.linkedColId !== undefined) {
+                const srcData = (col?.sourceBoardId === firstExtraLinkCol?.sourceBoardId)
+                  ? extraSrcBoardData
+                  : undefined;
+                const lbl = srcData?.columns.find(c => c.id === cond.linkedColId)?.label
+                  ?? cond.linkedColId ?? '…';
+                return (
+                  <p key={i} className="text-sm text-app-t3">
+                    <span className="text-app-t2 font-medium">{connLabel}</span>{' '}
+                    <span className="text-app-t2">{col?.label ?? '…'}</span>
+                    {' linked item '}
+                    <span className="text-app-t2">{lbl} </span>
+                    <span className="text-app-t3">{(cond.linkedOp ?? 'eq') === 'contains' ? 'contains ' : 'is '}</span>
+                    <span className="text-app-ac/70">{cond.linkedValue ?? '…'}</span>
+                  </p>
+                );
+              }
               return (
                 <p key={i} className="text-sm text-app-t3">
                   <span className="text-app-t2 font-medium">{connLabel}</span>{' '}
@@ -429,6 +463,9 @@ function AutomationEditor({
         value: c.value,
         op: c.op,
         connector: (c.connector ?? (savedScope === 'any' ? 'or' : 'and')) as 'and' | 'or',
+        linkedColId: c.linkedColId,
+        linkedValue: c.linkedValue,
+        linkedOp: c.linkedOp,
       })),
     ];
   });
@@ -509,9 +546,20 @@ function AutomationEditor({
         ...(extras.length > 0 ? {
           extraConditions: extras.map(e => {
             const eCol = allColumns.find(c => c.id === e.colId);
+            const isLinkExtra = eCol?.type === 'link';
             const op: 'eq' | 'contains' = eCol?.type === 'notes' ? 'contains' : 'eq';
             const connector: 'and' | 'or' = e.connector ?? (scope === 'any' ? 'or' : 'and');
-            return { colId: e.colId, value: e.value ?? '', op, connector };
+            return {
+              colId: e.colId,
+              value: isLinkExtra ? '' : (e.value ?? ''),
+              op,
+              connector,
+              ...(isLinkExtra ? {
+                linkedColId: e.linkedColId,
+                linkedValue: e.linkedValue,
+                linkedOp: e.linkedOp ?? 'eq',
+              } : {}),
+            };
           }),
         } : {}),
         scope,
