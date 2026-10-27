@@ -493,6 +493,24 @@ function NewEventModal({
     }
   }
 
+  async function handleUpdateOld() {
+    if (!duplicateOf || creating) return;
+    setCreating(true);
+    setDuplicateOf(null);
+    try {
+      const nonEmptyFields = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== ''));
+      if (Object.keys(nonEmptyFields).length > 0) {
+        const existingTask = (calData?.tasks ?? []).find(t => t.id === duplicateOf.id);
+        const existingFields = ((existingTask?.fields ?? {}) as Record<string, string>);
+        await orpcClient.task.updateTaskFields({ taskId: duplicateOf.id, fields: { ...existingFields, ...nonEmptyFields } });
+      }
+      onCreated();
+      onClose();
+    } catch {
+      setCreating(false);
+    }
+  }
+
   async function handleCreate() {
     if (!canCreate || creating) return;
     const trimmed = name.trim();
@@ -684,23 +702,24 @@ function NewEventModal({
 
         {/* Footer — duplicate prompt or normal actions */}
         {duplicateOf ? (
-          <div className="px-5 py-4 border-t border-gray-800 flex-shrink-0 space-y-2">
+          <div className="px-5 py-4 border-t border-gray-800 flex-shrink-0 space-y-2.5">
             <p className="text-xs text-gray-400">
-              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board.
+              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board. Click away to cancel.
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => setDuplicateOf(null)}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+                onClick={handleUpdateOld}
+                disabled={creating}
+                className="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-gray-700 hover:bg-gray-600 disabled:opacity-40 rounded-lg transition-colors"
               >
-                ← Back
+                {creating ? 'Updating…' : 'Update Old'}
               </button>
               <button
                 onClick={doCreate}
                 disabled={creating}
                 className="flex-1 px-3 py-1.5 text-xs font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white rounded-lg transition-colors"
               >
-                {creating ? 'Creating…' : 'Create anyway'}
+                {creating ? 'Creating…' : 'Create New'}
               </button>
             </div>
           </div>

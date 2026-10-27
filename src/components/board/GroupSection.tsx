@@ -617,24 +617,27 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
         </tr>
       )}
       {duplicateOf && createPortal(
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onMouseDown={e => { if (e.target === e.currentTarget) handleUseExisting(); }}
+        >
           <div className="w-full max-w-xs bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl mx-4 p-5">
             <h3 className="text-sm font-semibold text-white mb-1">Duplicate task name</h3>
             <p className="text-xs text-gray-400 mb-4">
-              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board.
+              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board. Click away to cancel.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={handleUseExisting}
-                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
               >
-                Delete new, keep existing
+                Update Old
               </button>
               <button
                 onClick={handleCreateAnyway}
-                className="flex-1 px-3 py-2 text-xs font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
               >
-                Create as new
+                Create New
               </button>
             </div>
           </div>
