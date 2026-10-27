@@ -136,7 +136,7 @@ function WorkspaceHome({
   const { data: boards } = useSuspenseQuery(orpcUtils.board.listBoards.queryOptions({ input: {} }));
 
   return (
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
+    <div className="flex h-screen bg-app-bg overflow-hidden">
       <Sidebar
         boards={boards ?? []}
         workspaces={workspaces}
@@ -147,7 +147,7 @@ function WorkspaceHome({
         onSignOut={onSignOut}
       />
       <main className="flex-1 flex items-center justify-center">
-        <div className="text-center text-gray-600">
+        <div className="text-center text-app-t3">
           <p className="text-lg">Select a board from the sidebar</p>
           <p className="text-sm mt-1">or create a new one</p>
         </div>
