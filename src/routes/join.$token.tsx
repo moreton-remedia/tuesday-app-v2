@@ -51,7 +51,9 @@ function JoinPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-app-bg">
       <div className="w-full max-w-sm px-4">
-        <h1 className="text-3xl font-bold text-app-t1 text-center mb-8">Tuesday</h1>
+        <div className="flex justify-center mb-8">
+          <img src="/logo.png" alt="Tuesday" className="h-14 w-auto" />
+        </div>
 
         <div className="bg-app-s1 border border-app-ln rounded-xl p-8">
           {stage.type === 'loading' && (

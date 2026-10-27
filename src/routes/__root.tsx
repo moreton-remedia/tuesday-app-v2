@@ -15,7 +15,10 @@ export const Route = createRootRouteWithContext<{
       },
       { title: 'Tuesday' },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'icon', href: '/logo.png', type: 'image/png' },
+    ],
   }),
   component: RootComponent,
 });

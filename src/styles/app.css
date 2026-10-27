@@ -27,8 +27,8 @@
   --c-t3:    oklch(0.660 0.014  68);   /* muted */
 
   /* Accent */
-  --c-ac:    oklch(0.470 0.115 142);   /* sage green — matches company logo */
-  --c-ac-lt: oklch(0.470 0.115 142 / 0.10);
+  --c-ac:    oklch(0.621 0.079 124);   /* sage green — exact brand green #75923f */
+  --c-ac-lt: oklch(0.621 0.079 124 / 0.10);
   --c-ac-tx: oklch(1.000 0.000   0);
 
   /* Danger */
@@ -41,7 +41,7 @@
   --muted:               oklch(0.935 0.012 78);
   --muted-foreground:    oklch(0.660 0.014 68);
   --border:              oklch(0.878 0.013 75);
-  --primary:             oklch(0.470 0.115 142);
+  --primary:             oklch(0.621 0.079 124);
   --primary-foreground:  oklch(1.000 0.000 0);
 }
 

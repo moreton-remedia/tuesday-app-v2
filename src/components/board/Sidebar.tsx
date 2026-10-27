@@ -91,13 +91,8 @@ export function Sidebar({ boards, workspaces, activeWorkspaceId, inviteToken, wo
         {/* Brand header */}
         <div className="px-4 py-4 border-b border-app-ln">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-6 h-6 rounded-md bg-app-ac flex items-center justify-center flex-shrink-0">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-app-ac-tx">
-                  <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                </svg>
-              </div>
-              <span className="text-[14px] font-semibold text-app-t1 tracking-tight">Tuesday</span>
+            <div className="flex items-center">
+              <img src="/logo.png" alt="Tuesday" className="h-7 w-auto" />
             </div>
             <button
               onClick={() => setShowSettings(true)}
