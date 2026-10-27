@@ -246,7 +246,7 @@ function CalendarView({
   return (
     <div className="flex flex-1 min-w-0 overflow-hidden">
       {/* ── Board filter panel ── */}
-      <div className="hidden md:flex flex-col w-44 flex-shrink-0 bg-app-s1 border-r border-app-ln overflow-y-auto">
+      <div className="hidden md:flex flex-col w-44 flex-shrink-0 bg-app-s2 border-r border-app-ln overflow-y-auto">
         <div className="p-3 border-b border-app-ln">
           <p className="text-[10px] font-semibold text-app-t3 uppercase tracking-wider">Boards</p>
         </div>
