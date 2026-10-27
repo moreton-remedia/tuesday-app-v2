@@ -80,7 +80,7 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
     <div className={`rounded-xl overflow-hidden border border-app-ln bg-app-s1 shadow-sm ${isDragging ? 'opacity-40' : ''}`}>
       {/* Group header */}
       <div
-        className="flex items-center gap-2 px-4 py-2.5 bg-app-s2 group/grphdr"
+        className="flex items-center gap-2 px-4 py-2.5 bg-app-s2 border-b border-app-ln group/grphdr"
         style={{ borderLeft: `4px solid ${group.color}` }}
       >
         {/* Drag handle */}
