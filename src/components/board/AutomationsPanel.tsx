@@ -312,7 +312,7 @@ function AutomationCard({
       {/* Card body */}
       <div className="px-3 py-2.5 space-y-0.5">
         <div className="flex items-start gap-2">
-          <span className="flex-shrink-0 text-[9px] font-bold tracking-widest text-indigo-400 bg-indigo-500/15 px-1.5 py-0.5 rounded mt-0.5 uppercase">IF</span>
+          <span className="flex-shrink-0 text-[9px] font-bold tracking-widest text-app-ac bg-app-ac/15 px-1.5 py-0.5 rounded mt-0.5 uppercase">IF</span>
           <div className="space-y-0.5 min-w-0">
             <p className="text-sm text-app-t3 leading-relaxed">
               <span className="text-app-t1 font-medium">{scope} </span>
@@ -350,7 +350,7 @@ function AutomationCard({
         </div>
         <div className="pl-[26px] text-app-t3/40 text-xs leading-none py-0.5">↓</div>
         <div className="flex items-start gap-2">
-          <span className="flex-shrink-0 text-[9px] font-bold tracking-widest text-indigo-400 bg-indigo-500/15 px-1 py-0.5 rounded mt-0.5 uppercase">THEN</span>
+          <span className="flex-shrink-0 text-[9px] font-bold tracking-widest text-app-ac bg-app-ac/15 px-1 py-0.5 rounded mt-0.5 uppercase">THEN</span>
           <div className="space-y-0.5 min-w-0">
             {auto.actions.map((a, i) => (
               <p key={i} className="text-sm text-app-t3">{describeAction(a)}</p>
@@ -559,7 +559,7 @@ function AutomationEditor({
 
       {/* ── IF ── */}
       <div className="px-4 py-3.5 flex items-start gap-3 bg-app-s2/40">
-        <span className="flex-shrink-0 bg-indigo-600 text-white text-[10px] font-bold tracking-widest px-2.5 py-1 rounded mt-1 uppercase">
+        <span className="flex-shrink-0 bg-app-ac text-app-ac-tx text-[10px] font-bold tracking-widest px-2.5 py-1 rounded mt-1 uppercase">
           IF
         </span>
         <div className="flex-1 min-w-0">
@@ -594,7 +594,7 @@ function AutomationEditor({
 
       {/* ── THEN ── */}
       <div className="px-4 py-3.5 flex items-start gap-3 bg-app-s2/40">
-        <span className="flex-shrink-0 bg-indigo-600 text-white text-[10px] font-bold tracking-widest px-1.5 py-1 rounded mt-1 uppercase">
+        <span className="flex-shrink-0 bg-app-ac text-app-ac-tx text-[10px] font-bold tracking-widest px-1.5 py-1 rounded mt-1 uppercase">
           THEN
         </span>
         <div className="flex-1 min-w-0">

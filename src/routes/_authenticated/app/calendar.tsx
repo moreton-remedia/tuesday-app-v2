@@ -1655,7 +1655,7 @@ function DayView({ date, events, onTaskClick, onCreateEvent }: {
           onClick={() => onCreateEvent(dateStr)}
           className="w-full flex items-center gap-2 px-4 py-3 mb-3 rounded-xl border border-dashed border-app-ln hover:border-app-ac/50 hover:bg-app-ac/10 text-app-t3 hover:text-app-ac transition-colors text-sm group"
         >
-          <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-xs flex-shrink-0 group-hover:border-violet-400">+</span>
+          <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-xs flex-shrink-0">+</span>
           Add task for this day
         </button>
 

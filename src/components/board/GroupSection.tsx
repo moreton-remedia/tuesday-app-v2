@@ -314,7 +314,7 @@ function GroupTaskTable({
                 aria-label="Select all tasks in group"
               >
                 {allSelected && <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                {someSelected && !allSelected && <span className="w-1.5 h-0.5 bg-violet-400 rounded" />}
+                {someSelected && !allSelected && <span className="w-1.5 h-0.5 bg-app-ac rounded" />}
               </button>
             </th>
             <th

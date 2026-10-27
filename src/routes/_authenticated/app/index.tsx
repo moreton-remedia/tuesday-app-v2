@@ -78,42 +78,42 @@ function WorkspaceSetup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
+    <div className="min-h-screen flex items-center justify-center bg-app-bg">
       <div className="w-full max-w-md px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Tuesday</h1>
-          <p className="text-gray-400 mt-1">Set up your workspace</p>
+          <h1 className="text-3xl font-bold text-app-t1">Tuesday</h1>
+          <p className="text-app-t3 mt-1">Set up your workspace</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8">
+        <div className="bg-app-s1 border border-app-ln rounded-xl p-8">
           <div className="flex gap-2 mb-6">
-            <button onClick={() => setMode('create')} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'create' ? 'bg-violet-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>Create workspace</button>
-            <button onClick={() => setMode('join')} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'join' ? 'bg-violet-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>Join workspace</button>
+            <button onClick={() => setMode('create')} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'create' ? 'bg-app-ac text-app-ac-tx' : 'bg-app-s3 text-app-t3 hover:text-app-t1'}`}>Create workspace</button>
+            <button onClick={() => setMode('join')} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'join' ? 'bg-app-ac text-app-ac-tx' : 'bg-app-s3 text-app-t3 hover:text-app-t1'}`}>Join workspace</button>
           </div>
           {mode === 'create' ? (
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Workspace name</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Acme Corp" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500" />
+                <label className="block text-sm text-app-t3 mb-1">Workspace name</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Acme Corp" className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-app-t1 text-sm focus:outline-none focus:border-app-ac" />
               </div>
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-              <button type="submit" disabled={loading} className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-medium py-2 rounded-lg text-sm transition-colors">{loading ? 'Creating…' : 'Create workspace'}</button>
+              {error && <p className="text-app-dg text-sm">{error}</p>}
+              <button type="submit" disabled={loading} className="w-full bg-app-ac hover:bg-app-ac/90 disabled:opacity-50 text-app-ac-tx font-medium py-2 rounded-lg text-sm transition-colors">{loading ? 'Creating…' : 'Create workspace'}</button>
             </form>
           ) : (
             <form onSubmit={handleJoin} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Invite link</label>
+                <label className="block text-sm text-app-t3 mb-1">Invite link</label>
                 <input
                   type="text"
                   value={inviteInput}
                   onChange={e => setInviteInput(e.target.value)}
                   required
                   placeholder="Paste your invite link here"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500"
+                  className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-app-t1 text-sm focus:outline-none focus:border-app-ac"
                 />
-                <p className="text-xs text-gray-600 mt-1">Ask your workspace owner for an invite link.</p>
+                <p className="text-xs text-app-t3/60 mt-1">Ask your workspace owner for an invite link.</p>
               </div>
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-              <button type="submit" disabled={loading} className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-medium py-2 rounded-lg text-sm transition-colors">{loading ? 'Joining…' : 'Join workspace'}</button>
+              {error && <p className="text-app-dg text-sm">{error}</p>}
+              <button type="submit" disabled={loading} className="w-full bg-app-ac hover:bg-app-ac/90 disabled:opacity-50 text-app-ac-tx font-medium py-2 rounded-lg text-sm transition-colors">{loading ? 'Joining…' : 'Join workspace'}</button>
             </form>
           )}
         </div>

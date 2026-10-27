@@ -343,7 +343,7 @@ function BoardList({ boards: propBoards }: { boards: Board[] }) {
           className={[
             'group relative flex items-center rounded-lg transition-colors',
             dragIndex === index ? 'opacity-40' : '',
-            dragOverIndex === index && dragIndex !== index ? 'border-t-2 border-violet-500' : '',
+            dragOverIndex === index && dragIndex !== index ? 'border-t-2 border-app-ac' : '',
           ].join(' ')}
         >
           {/* Drag handle */}
