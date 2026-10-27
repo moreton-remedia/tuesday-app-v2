@@ -476,7 +476,9 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
   }
 
   async function handleUseExisting() {
+    const dup = duplicateOf;
     setDuplicateOf(null);
+    if (dup) await orpcClient.task.updateTask({ taskId: dup.id, groupId: task.groupId });
     await orpcClient.task.deleteTask({ taskId: task.id });
     invalidate();
   }

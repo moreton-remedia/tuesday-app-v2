@@ -498,6 +498,9 @@ function NewEventModal({
     setCreating(true);
     setDuplicateOf(null);
     try {
+      // Move existing task into the target group (and board)
+      await orpcClient.task.updateTask({ taskId: duplicateOf.id, groupId });
+      // Merge entered fields on top of the existing task's fields
       const nonEmptyFields = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== ''));
       if (Object.keys(nonEmptyFields).length > 0) {
         const existingTask = (calData?.tasks ?? []).find(t => t.id === duplicateOf.id);
