@@ -55,9 +55,11 @@ interface SidebarProps {
   workspaceName: string;
   userName: string;
   onSignOut: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export function Sidebar({ boards, workspaces, activeWorkspaceId, inviteToken, workspaceName, userName, onSignOut }: SidebarProps) {
+export function Sidebar({ boards, workspaces, activeWorkspaceId, inviteToken, workspaceName, userName, onSignOut, mobileOpen = false, onMobileClose }: SidebarProps) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
@@ -78,14 +80,25 @@ export function Sidebar({ boards, workspaces, activeWorkspaceId, inviteToken, wo
 
   return (
     <>
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={onMobileClose}
+        />
+      )}
       <aside
-        className="relative flex flex-col flex-shrink-0 h-full bg-app-sb"
+        className={[
+          'flex flex-col flex-shrink-0 h-full bg-app-sb',
+          'fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-in-out',
+          'md:relative md:inset-auto md:z-auto md:transition-none md:translate-x-0',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+        ].join(' ')}
         style={{ width, borderRight: '1px solid var(--c-sb-b)' }}
       >
         {/* Resize handle */}
         <div
           onMouseDown={startResize}
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize z-10 hover:bg-app-ac/25 transition-colors"
+          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize z-10 hover:bg-app-ac/25 transition-colors hidden md:block"
         />
 
         {/* Brand header */}
@@ -112,6 +125,7 @@ export function Sidebar({ boards, workspaces, activeWorkspaceId, inviteToken, wo
         <nav className="flex-1 px-2.5 py-3 overflow-y-auto">
           <Link
             to="/app/calendar"
+            onClick={onMobileClose}
             className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-app-t2 hover:text-app-t1 hover:bg-app-ln-s [&.active]:text-app-ac [&.active]:bg-app-ac-lt [&.active]:font-medium w-full mb-0.5"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
@@ -126,7 +140,7 @@ export function Sidebar({ boards, workspaces, activeWorkspaceId, inviteToken, wo
           <div className="px-2.5 pt-4 pb-1">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-app-t3">Boards</span>
           </div>
-          <BoardList boards={boards} />
+          <BoardList boards={boards} onItemClick={onMobileClose} />
           <button
             onClick={handleCreateBoard}
             disabled={creating}
@@ -200,7 +214,7 @@ function ThemeToggle() {
 
 // ── Board list with drag-to-reorder, inline rename, and ⋯ context menu ────────
 
-function BoardList({ boards: propBoards }: { boards: Board[] }) {
+function BoardList({ boards: propBoards, onItemClick }: { boards: Board[]; onItemClick?: () => void }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
@@ -364,6 +378,7 @@ function BoardList({ boards: propBoards }: { boards: Board[] }) {
             <Link
               to="/app/board/$boardId"
               params={{ boardId: board.id }}
+              onClick={onItemClick}
               className="flex-1 flex items-center gap-2 pl-5 pr-1 py-1.5 text-[13px] text-app-t2 hover:text-app-t1 [&.active]:text-app-ac [&.active]:font-medium rounded-lg hover:bg-app-ln-s [&.active]:bg-app-ac-lt transition-colors min-w-0"
               draggable={false}
             >

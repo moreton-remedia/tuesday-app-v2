@@ -1,0 +1,12 @@
+{
+  "name": "Tuesday",
+  "short_name": "Tuesday",
+  "description": "Your team's workspace",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#f5f2eb",
+  "theme_color": "#75923f",
+  "icons": [
+    { "src": "/logo.png", "sizes": "192x192 512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

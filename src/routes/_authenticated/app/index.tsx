@@ -134,6 +134,7 @@ function WorkspaceHome({
   onSignOut: () => void;
 }) {
   const { data: boards } = useSuspenseQuery(orpcUtils.board.listBoards.queryOptions({ input: {} }));
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-app-bg overflow-hidden">
@@ -145,13 +146,28 @@ function WorkspaceHome({
         workspaceName={workspace.name}
         userName={userName}
         onSignOut={onSignOut}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
       />
-      <main className="flex-1 flex items-center justify-center">
-        <div className="text-center text-app-t3">
-          <p className="text-lg">Select a board from the sidebar</p>
-          <p className="text-sm mt-1">or create a new one</p>
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="md:hidden flex items-center px-4 py-3 border-b border-app-ln flex-shrink-0 bg-app-bg">
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            className="p-1.5 rounded-lg text-app-t3 hover:text-app-t2 hover:bg-app-ln-s"
+            aria-label="Open navigation"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
         </div>
-      </main>
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center text-app-t3">
+            <p className="text-lg">Select a board from the sidebar</p>
+            <p className="text-sm mt-1">or create a new one</p>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

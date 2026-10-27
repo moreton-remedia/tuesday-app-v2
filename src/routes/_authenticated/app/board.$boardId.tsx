@@ -47,6 +47,7 @@ function BoardPage() {
   const qc = useQueryClient();
   const clearSelection = useSelectionStore(s => s.clearSelection);
   const [showAutomations, setShowAutomations] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Clear selection when switching boards
   useEffect(() => { clearSelection(); }, [boardId]);
@@ -114,17 +115,28 @@ function BoardPage() {
         inviteToken={workspace?.inviteToken ?? ''}
         userName={session.data?.user.name ?? ''}
         onSignOut={handleSignOut}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
       />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Board header */}
-        <div className="border-b border-app-ln px-6 py-4 bg-app-bg flex items-center gap-3 flex-shrink-0">
+        <div className="border-b border-app-ln px-4 md:px-6 py-3 md:py-4 bg-app-bg flex items-center gap-2 md:gap-3 flex-shrink-0">
+          <button
+            className="md:hidden p-1.5 rounded-lg text-app-t3 hover:text-app-t2 hover:bg-app-ln-s flex-shrink-0"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open navigation"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
           <BoardNameInput key={boardId} value={data.board.name} onSave={handleUpdateBoardName} />
           <button
             onClick={() => setShowAutomations(true)}
-            className="ml-auto flex items-center gap-1.5 text-[13px] text-app-t3 hover:text-app-t1 px-3 py-1.5 rounded-lg hover:bg-app-ln-s"
+            className="ml-auto flex items-center gap-1.5 text-[13px] text-app-t3 hover:text-app-t1 px-2.5 py-1.5 rounded-lg hover:bg-app-ln-s"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>Automations</span>
+            <span className="hidden sm:inline">Automations</span>
             {data.automations.length > 0 && (
               <span className="bg-app-ac text-app-ac-tx text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                 {data.automations.length}
@@ -134,7 +146,7 @@ function BoardPage() {
         </div>
 
         {/* Groups */}
-        <div className="flex-1 overflow-auto p-6 space-y-4">
+        <div className="flex-1 overflow-auto p-3 md:p-6 space-y-4">
           <GroupList data={data} boardId={boardId} />
           <button
             onClick={handleAddGroup}

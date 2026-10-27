@@ -77,6 +77,8 @@ function CalendarPage() {
     await router.navigate({ to: '/login' });
   }
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   const boardInfos = useMemo<BoardInfo[]>(
     () => (calData?.boards ?? []).map((b, i) => ({
       id: b.id,
@@ -133,15 +135,30 @@ function CalendarPage() {
         workspaceName={workspace?.name ?? ''}
         userName={session.data?.user.name ?? ''}
         onSignOut={handleSignOut}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
       />
-      <main className="flex-1 flex overflow-hidden">
-        <CalendarView
-          events={events}
-          boards={boardInfos}
-          calData={calData}
-          firstDateColByBoard={firstDateColByBoard}
-        />
-      </main>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="md:hidden flex items-center px-4 py-3 border-b border-app-ln flex-shrink-0 bg-app-bg">
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            className="p-1.5 rounded-lg text-app-t3 hover:text-app-t2 hover:bg-app-ln-s"
+            aria-label="Open navigation"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <main className="flex-1 flex overflow-hidden">
+          <CalendarView
+            events={events}
+            boards={boardInfos}
+            calData={calData}
+            firstDateColByBoard={firstDateColByBoard}
+          />
+        </main>
+      </div>
     </div>
   );
 }
@@ -229,7 +246,7 @@ function CalendarView({
   return (
     <div className="flex flex-1 min-w-0 overflow-hidden">
       {/* ── Board filter panel ── */}
-      <div className="w-44 flex-shrink-0 bg-app-s1 border-r border-app-ln flex flex-col overflow-y-auto">
+      <div className="hidden md:flex flex-col w-44 flex-shrink-0 bg-app-s1 border-r border-app-ln overflow-y-auto">
         <div className="p-3 border-b border-app-ln">
           <p className="text-[10px] font-semibold text-app-t3 uppercase tracking-wider">Boards</p>
         </div>
