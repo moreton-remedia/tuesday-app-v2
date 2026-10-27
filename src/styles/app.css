@@ -47,34 +47,34 @@
 
 /* ── Design tokens — dark theme ───────────────────────────────── */
 .dark {
-  --c-bg:    oklch(0.150 0.018 274);
-  --c-sb:    oklch(0.128 0.016 277);
-  --c-sb-b:  oklch(0.258 0.020 275);
+  --c-bg:    oklch(0.200 0.018 274);
+  --c-sb:    oklch(0.178 0.016 277);
+  --c-sb-b:  oklch(0.310 0.018 275);
 
-  --c-s1:    oklch(0.192 0.022 274);
-  --c-s2:    oklch(0.228 0.022 272);
-  --c-s3:    oklch(0.264 0.021 270);
+  --c-s1:    oklch(0.248 0.020 274);
+  --c-s2:    oklch(0.288 0.020 272);
+  --c-s3:    oklch(0.325 0.018 270);
 
-  --c-ln:    oklch(0.285 0.020 272);
-  --c-ln-s:  oklch(0.234 0.018 274);
+  --c-ln:    oklch(0.348 0.018 272);
+  --c-ln-s:  oklch(0.290 0.016 274);
 
   --c-t1:    oklch(0.940 0.008 264);
-  --c-t2:    oklch(0.635 0.016 268);
-  --c-t3:    oklch(0.420 0.018 270);
+  --c-t2:    oklch(0.668 0.014 268);
+  --c-t3:    oklch(0.460 0.016 270);
 
-  --c-ac:    oklch(0.644 0.215 284);
-  --c-ac-lt: oklch(0.644 0.215 284 / 0.14);
+  --c-ac:    oklch(0.640 0.185 294);   /* purple — matches company variant logo */
+  --c-ac-lt: oklch(0.640 0.185 294 / 0.15);
   --c-ac-tx: oklch(1.000 0.000   0);
 
   --c-dg:    oklch(0.678 0.195  25);
   --c-dg-lt: oklch(0.678 0.195  25 / 0.12);
 
-  --background:          oklch(0.150 0.018 274);
+  --background:          oklch(0.200 0.018 274);
   --foreground:          oklch(0.940 0.008 264);
-  --muted:               oklch(0.264 0.021 270);
-  --muted-foreground:    oklch(0.420 0.018 270);
-  --border:              oklch(0.285 0.020 272);
-  --primary:             oklch(0.644 0.215 284);
+  --muted:               oklch(0.325 0.018 270);
+  --muted-foreground:    oklch(0.460 0.016 270);
+  --border:              oklch(0.348 0.018 272);
+  --primary:             oklch(0.640 0.185 294);
   --primary-foreground:  oklch(1.000 0.000 0);
 }
 
