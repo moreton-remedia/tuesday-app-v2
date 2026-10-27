@@ -117,11 +117,11 @@ function BoardPage() {
       />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Board header */}
-        <div className="border-b border-gray-800 px-6 py-4 bg-gray-950 flex items-center gap-3 flex-shrink-0">
+        <div className="border-b border-gray-800/50 px-6 py-4 bg-gray-950 flex items-center gap-3 flex-shrink-0">
           <BoardNameInput key={boardId} value={data.board.name} onSave={handleUpdateBoardName} />
           <button
             onClick={() => setShowAutomations(true)}
-            className="ml-auto flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-800"
+            className="ml-auto flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-800/60"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span>Automations</span>
@@ -138,7 +138,7 @@ function BoardPage() {
           <GroupList data={data} boardId={boardId} />
           <button
             onClick={handleAddGroup}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors py-1"
+            className="flex items-center gap-2 text-[13px] hover:text-gray-300 transition-colors py-1.5 px-2.5 rounded-lg hover:bg-gray-800/40" style={{ color: 'oklch(0.48 0.016 268)' }}
           >
             <span className="text-base leading-none">+</span>
             Add group
@@ -261,7 +261,7 @@ function BoardNameInput({ value, onSave }: { value: string; onSave: (v: string) 
           e.currentTarget.blur();
         }
       }}
-      className="text-2xl font-bold text-white bg-transparent outline-none min-w-0 flex-1 max-w-lg"
+      className="text-xl font-semibold bg-transparent outline-none min-w-0 flex-1 max-w-lg" style={{ color: 'oklch(0.91 0.008 265)' }}
       aria-label="Board name"
     />
   );

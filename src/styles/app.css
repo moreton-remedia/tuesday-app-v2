@@ -3,6 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Design token overrides ── */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -16,8 +17,33 @@
   --color-primary-foreground: var(--primary-foreground);
 }
 
+/* Warm purple-slate gray scale — replaces cold industrial grays */
+@theme {
+  --color-gray-950: oklch(0.110 0.024 282);
+  --color-gray-900: oklch(0.152 0.028 278);
+  --color-gray-800: oklch(0.202 0.030 275);
+  --color-gray-700: oklch(0.278 0.026 272);
+  --color-gray-600: oklch(0.395 0.022 270);
+  --color-gray-500: oklch(0.535 0.018 268);
+  --color-gray-400: oklch(0.668 0.014 265);
+  --color-gray-300: oklch(0.795 0.010 262);
+  --color-gray-200: oklch(0.882 0.007 260);
+  --color-gray-100: oklch(0.936 0.005 258);
+  --color-gray-50:  oklch(0.972 0.003 256);
+
+  /* Softer violet — less neon, more lilac */
+  --color-violet-700: oklch(0.47 0.200 290);
+  --color-violet-600: oklch(0.56 0.210 288);
+  --color-violet-500: oklch(0.64 0.215 285);
+  --color-violet-400: oklch(0.72 0.193 282);
+  --color-violet-300: oklch(0.80 0.158 280);
+  --color-violet-200: oklch(0.88 0.108 278);
+  --color-violet-100: oklch(0.94 0.060 276);
+  --color-violet-50:  oklch(0.97 0.030 274);
+}
+
 :root {
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --background: oklch(0.98 0.005 90);
   --foreground: oklch(0.20 0.01 90);
   --muted: oklch(0.94 0.006 90);
@@ -27,8 +53,43 @@
   --primary-foreground: oklch(0.97 0.006 170);
 }
 
+/* ── Global base styles ── */
 body {
   background: var(--background);
   color: var(--foreground);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Smooth micro-transitions on interactive elements */
+button, a, input, select, textarea {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+/* Softer custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.30 0.020 278 / 0.5);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.40 0.022 275 / 0.7);
+}
+
+/* Softer focus rings */
+*:focus-visible {
+  outline: 2px solid oklch(0.64 0.215 285 / 0.6);
+  outline-offset: 2px;
+}
+
+/* Task row hover — soft glow rather than block colour change */
+.task-row-hover:hover {
+  background: oklch(0.202 0.030 275 / 0.6);
+}

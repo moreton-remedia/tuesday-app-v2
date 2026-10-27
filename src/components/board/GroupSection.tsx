@@ -77,10 +77,10 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
   }
 
   return (
-    <div className={`rounded-lg overflow-hidden border border-gray-800 ${isDragging ? 'opacity-40' : ''}`}>
+    <div className={`rounded-xl overflow-hidden border border-gray-800/55 shadow-sm ${isDragging ? 'opacity-40' : ''}`}>
       {/* Group header */}
       <div
-        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 group/grphdr"
+        className="flex items-center gap-2 px-4 py-2.5 bg-gray-900/70 group/grphdr"
         style={{ borderLeft: `4px solid ${group.color}` }}
       >
         {/* Drag handle */}
@@ -302,7 +302,7 @@ function GroupTaskTable({
     <div className="overflow-x-auto">
       <table className="border-collapse table-fixed w-full min-w-full">
         <thead>
-          <tr className="border-b border-gray-700 bg-gray-800">
+          <tr className="border-b border-gray-700/50 bg-gray-800/60">
             <th className="px-3 py-2" style={{ width: 40 }}>
               <button
                 onClick={() => selectAllTasks(taskIds, boardId)}
@@ -318,7 +318,7 @@ function GroupTaskTable({
               </button>
             </th>
             <th
-              className="relative px-3 py-2 text-left text-sm text-gray-500 font-medium border-r border-gray-700 select-none"
+              className="relative px-3 py-2 text-left text-[12px] text-gray-500 font-medium border-r border-gray-700/50 select-none"
               style={{ width: taskNameWidth }}
             >
               Task name
