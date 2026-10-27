@@ -30,35 +30,35 @@ function LoginPage() {
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-white mb-6">Sign in</h2>
+      <h2 className="text-xl font-semibold text-app-t1 mb-6">Sign in</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Email</label>
+          <label className="block text-sm text-app-t3 mb-1">Email</label>
           <input
             type="email" value={email} onChange={e => setEmail(e.target.value)}
             required autoComplete="email"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500"
+            className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-app-t1 text-sm focus:outline-none focus:border-app-ac"
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Password</label>
+          <label className="block text-sm text-app-t3 mb-1">Password</label>
           <input
             type="password" value={password} onChange={e => setPassword(e.target.value)}
             required autoComplete="current-password"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500"
+            className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-app-t1 text-sm focus:outline-none focus:border-app-ac"
           />
         </div>
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <button
           type="submit" disabled={loading}
-          className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-medium py-2 rounded-lg text-sm transition-colors"
+          className="w-full bg-app-ac hover:bg-app-ac/90 disabled:opacity-50 text-app-ac-tx font-medium py-2 rounded-lg text-sm transition-colors"
         >
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-app-t3 mt-6">
         No account?{' '}
-        <Link to="/register" className="text-violet-400 hover:text-violet-300">Create one</Link>
+        <Link to="/register" className="text-app-ac hover:text-app-ac/80">Create one</Link>
       </p>
     </>
   );

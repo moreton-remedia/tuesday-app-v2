@@ -43,20 +43,22 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
   return createPortal(
     <>
       <div className="fixed inset-0 z-[200] bg-black/40" onMouseDown={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-[201] w-96 bg-gray-900 border-l border-gray-800 flex flex-col shadow-2xl">
+      <div className="fixed right-0 top-0 bottom-0 z-[201] w-96 bg-app-s1 border-l border-app-ln flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-          <h2 className="text-base font-semibold text-white flex items-center gap-2">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-app-ln">
+          <h2 className="text-base font-semibold text-app-t1 flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Automations
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 text-xl leading-none">×</button>
+          <button onClick={onClose} className="text-app-t3 hover:text-app-t2 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+          </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {automations.length === 0 && !editing && (
-            <p className="text-sm text-gray-500 text-center py-8">No automations yet. Add one to get started.</p>
+            <p className="text-sm text-app-t3 text-center py-8">No automations yet. Add one to get started.</p>
           )}
 
           {automations.map(auto => (
@@ -91,7 +93,7 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
           <div className="px-4 pb-4">
             <button
               onClick={() => setEditing('new')}
-              className="w-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              className="w-full bg-app-ac hover:bg-app-ac/90 text-app-ac-tx text-sm font-medium py-2 rounded-lg transition-colors"
             >
               + Add automation
             </button>
@@ -125,11 +127,11 @@ function Token({
   const selected = options.find(o => o.key === value);
   const displayLabel = selected?.label ?? <span className="opacity-50">{placeholder}</span>;
 
-  const textCls = variant === 'accent' ? 'text-violet-300' : 'text-white';
+  const textCls = variant === 'accent' ? 'text-app-ac' : 'text-app-t1';
   const borderCls = variant === 'accent'
-    ? 'border-violet-500/60 hover:border-violet-400'
-    : 'border-gray-500/70 hover:border-gray-400';
-  const arrowCls = variant === 'accent' ? 'text-violet-500/70' : 'text-gray-500';
+    ? 'border-app-ac/60 hover:border-app-ac'
+    : 'border-app-ln hover:border-app-t3';
+  const arrowCls = variant === 'accent' ? 'text-app-ac/70' : 'text-app-t3';
 
   const filtered = search.trim()
     ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
@@ -163,34 +165,34 @@ function Token({
         <>
           <div className="fixed inset-0 z-[300]" onMouseDown={handleClose} />
           <div
-            className="fixed z-[301] bg-gray-900 border border-gray-700 rounded-lg shadow-xl overflow-hidden"
+            className="fixed z-[301] bg-app-s1 border border-app-ln rounded-lg shadow-xl overflow-hidden"
             style={{ top: rect.bottom + 6, left: rect.left, minWidth: 160 }}
             onMouseDown={e => e.stopPropagation()}
           >
             {/* Search input */}
-            <div className="px-2 pt-2 pb-1 border-b border-gray-800">
+            <div className="px-2 pt-2 pb-1 border-b border-app-ln">
               <input
                 ref={searchRef}
                 autoFocus
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search…"
-                className="w-full bg-gray-800 text-xs text-white rounded px-2 py-1 outline-none placeholder-gray-600 border border-gray-700 focus:border-gray-500"
+                className="w-full bg-app-s2 text-xs text-app-t1 rounded px-2 py-1 outline-none placeholder-app-t3/50 border border-app-ln focus:border-app-t3"
               />
             </div>
             {/* Options list */}
             <div className="py-1 max-h-52 overflow-y-auto">
               {filtered.length === 0 && (
-                <p className="px-3 py-2 text-xs text-gray-600">No matches</p>
+                <p className="px-3 py-2 text-xs text-app-t3/50">No matches</p>
               )}
               {filtered.map(opt => (
                 <button
                   key={opt.key}
                   onMouseDown={() => { onChange(opt.key); handleClose(); }}
-                  className={`w-full text-left px-3 py-1.5 text-sm transition-colors hover:bg-gray-800 ${
+                  className={`w-full text-left px-3 py-1.5 text-sm transition-colors hover:bg-app-s2 ${
                     opt.key === value
-                      ? variant === 'accent' ? 'text-violet-300 font-medium' : 'text-white font-medium'
-                      : 'text-gray-300'
+                      ? variant === 'accent' ? 'text-app-ac font-medium' : 'text-app-t1 font-medium'
+                      : 'text-app-t2'
                   }`}
                 >
                   {opt.label}
@@ -214,7 +216,7 @@ function TextToken({ value, onChange, placeholder = '…' }: {
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
-      className="bg-transparent border-b border-gray-500/70 text-white text-sm font-medium outline-none pb-px mx-0.5 w-28 placeholder-gray-600 hover:border-gray-400 transition-colors align-baseline"
+      className="bg-transparent border-b border-app-ln text-app-t1 text-sm font-medium outline-none pb-px mx-0.5 w-28 placeholder-app-t3/50 hover:border-app-t3 transition-colors align-baseline"
     />
   );
 }
@@ -285,24 +287,26 @@ function AutomationCard({
   const scope = auto.trigger.scope ?? 'all';
 
   return (
-    <div className={`rounded-xl border overflow-hidden ${auto.enabled === 1 ? 'bg-gray-800/60 border-gray-700' : 'bg-gray-800/30 border-gray-800 opacity-50'}`}>
+    <div className={`rounded-xl border overflow-hidden ${auto.enabled === 1 ? 'bg-app-s2/60 border-app-ln' : 'bg-app-s2/30 border-app-ln/50 opacity-50'}`}>
       {/* Card header row */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700/50">
-        <span className="text-xs font-semibold text-gray-300 truncate">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-app-ln/50">
+        <span className="text-xs font-semibold text-app-t2 truncate">
           {auto.trigger.automationName || 'Automation'}
         </span>
         <div className="flex items-center gap-1 flex-shrink-0 ml-2">
           <button
             onClick={onToggle}
-            className={`w-8 h-4 rounded-full transition-colors relative flex-shrink-0 ${auto.enabled === 1 ? 'bg-violet-600' : 'bg-gray-600'}`}
+            className={`w-8 h-4 rounded-full transition-colors relative flex-shrink-0 ${auto.enabled === 1 ? 'bg-app-ac' : 'bg-app-s3'}`}
             title={auto.enabled === 1 ? 'Disable' : 'Enable'}
           >
             <span className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${auto.enabled === 1 ? 'left-[18px]' : 'left-0.5'}`} />
           </button>
-          <button onClick={onEdit} className="text-gray-600 hover:text-gray-300 p-1" title="Edit">
+          <button onClick={onEdit} className="text-app-t3 hover:text-app-t2 p-1" title="Edit">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button onClick={onDelete} className="text-gray-700 hover:text-red-400 text-base leading-none p-1">×</button>
+          <button onClick={onDelete} className="text-app-t3/30 hover:text-app-dg p-1 transition-colors" title="Delete">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+          </button>
         </div>
       </div>
       {/* Card body */}
@@ -310,20 +314,20 @@ function AutomationCard({
         <div className="flex items-start gap-2">
           <span className="flex-shrink-0 text-[9px] font-bold tracking-widest text-indigo-400 bg-indigo-500/15 px-1.5 py-0.5 rounded mt-0.5 uppercase">IF</span>
           <div className="space-y-0.5 min-w-0">
-            <p className="text-sm text-gray-400 leading-relaxed">
-              <span className="text-white font-medium">{scope} </span>
-              <span className="text-white font-medium">{triggerCol?.label ?? '…'}</span>
+            <p className="text-sm text-app-t3 leading-relaxed">
+              <span className="text-app-t1 font-medium">{scope} </span>
+              <span className="text-app-t1 font-medium">{triggerCol?.label ?? '…'}</span>
               {auto.trigger.type === 'link-changes' ? (
                 <>
                   {' linked item '}
-                  <span className="text-gray-300">{linkedColLabel ?? '…'} </span>
-                  <span className="text-gray-400">{auto.trigger.linkedOp === 'contains' ? 'contains ' : 'is '}</span>
-                  <span className="text-violet-300 font-medium">{auto.trigger.linkedValue ?? '…'}</span>
+                  <span className="text-app-t2">{linkedColLabel ?? '…'} </span>
+                  <span className="text-app-t3">{auto.trigger.linkedOp === 'contains' ? 'contains ' : 'is '}</span>
+                  <span className="text-app-ac font-medium">{auto.trigger.linkedValue ?? '…'}</span>
                 </>
               ) : (
                 <>
                   {auto.trigger.type === 'text-contains' ? ' contains ' : ' changes to '}
-                  <span className="text-violet-300 font-medium">{auto.trigger.value}</span>
+                  <span className="text-app-ac font-medium">{auto.trigger.value}</span>
                 </>
               )}
             </p>
@@ -334,22 +338,22 @@ function AutomationCard({
                 ? (cond.connector === 'or' ? 'Or' : 'And')
                 : (scope === 'any' ? 'Or' : 'And');
               return (
-                <p key={i} className="text-sm text-gray-500">
-                  <span className="text-gray-400 font-medium">{connLabel}</span>{' '}
-                  <span className="text-gray-300">{col?.label ?? '…'}</span>
+                <p key={i} className="text-sm text-app-t3">
+                  <span className="text-app-t2 font-medium">{connLabel}</span>{' '}
+                  <span className="text-app-t2">{col?.label ?? '…'}</span>
                   {cond.op === 'contains' ? ' contains ' : ' is '}
-                  <span className="text-violet-300/70">{cond.value}</span>
+                  <span className="text-app-ac/70">{cond.value}</span>
                 </p>
               );
             })}
           </div>
         </div>
-        <div className="pl-[26px] text-gray-700 text-xs leading-none py-0.5">↓</div>
+        <div className="pl-[26px] text-app-t3/40 text-xs leading-none py-0.5">↓</div>
         <div className="flex items-start gap-2">
           <span className="flex-shrink-0 text-[9px] font-bold tracking-widest text-indigo-400 bg-indigo-500/15 px-1 py-0.5 rounded mt-0.5 uppercase">THEN</span>
           <div className="space-y-0.5 min-w-0">
             {auto.actions.map((a, i) => (
-              <p key={i} className="text-sm text-gray-400">{describeAction(a)}</p>
+              <p key={i} className="text-sm text-app-t3">{describeAction(a)}</p>
             ))}
           </div>
         </div>
@@ -534,27 +538,27 @@ function AutomationEditor({
   }
 
   return (
-    <div className="rounded-xl border border-violet-600/30 overflow-hidden">
+    <div className="rounded-xl border border-app-ac/30 overflow-hidden">
       {/* ── Title ── */}
-      <div className="px-4 pt-3.5 pb-2.5 border-b border-gray-700/60 bg-gray-800/80">
-        <p className="text-sm font-semibold text-violet-400">
+      <div className="px-4 pt-3.5 pb-2.5 border-b border-app-ln/60 bg-app-s2/80">
+        <p className="text-sm font-semibold text-app-ac">
           {initial ? 'Edit Automation' : 'New Automation'}
         </p>
       </div>
 
       {/* ── Name ── */}
-      <div className="px-4 py-2.5 flex items-center gap-3 border-b border-gray-700/40 bg-gray-800/60">
-        <span className="text-xs text-gray-500 w-9 flex-shrink-0">Name</span>
+      <div className="px-4 py-2.5 flex items-center gap-3 border-b border-app-ln/40 bg-app-s2/60">
+        <span className="text-xs text-app-t3 w-9 flex-shrink-0">Name</span>
         <input
           value={autoName}
           onChange={e => setAutoName(e.target.value)}
           placeholder="Automation name…"
-          className="flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 border-b border-transparent focus:border-gray-500 pb-0.5 transition-colors"
+          className="flex-1 bg-transparent text-sm text-app-t1 outline-none placeholder-app-t3/50 border-b border-transparent focus:border-app-t3 pb-0.5 transition-colors"
         />
       </div>
 
       {/* ── IF ── */}
-      <div className="px-4 py-3.5 flex items-start gap-3 bg-gray-800/40">
+      <div className="px-4 py-3.5 flex items-start gap-3 bg-app-s2/40">
         <span className="flex-shrink-0 bg-indigo-600 text-white text-[10px] font-bold tracking-widest px-2.5 py-1 rounded mt-1 uppercase">
           IF
         </span>
@@ -578,7 +582,7 @@ function AutomationEditor({
           </div>
           <button
             onClick={addCondition}
-            className="mt-2.5 flex items-center gap-1 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+            className="mt-2.5 flex items-center gap-1 text-xs text-app-t3/60 hover:text-app-t2 transition-colors"
           >
             <span className="text-sm leading-none">+</span> Add condition
           </button>
@@ -586,10 +590,10 @@ function AutomationEditor({
       </div>
 
       {/* ── Arrow ── */}
-      <div className="text-center text-gray-600 text-base leading-none py-1 bg-gray-800/40">↓</div>
+      <div className="text-center text-app-t3/50 text-base leading-none py-1 bg-app-s2/40">↓</div>
 
       {/* ── THEN ── */}
-      <div className="px-4 py-3.5 flex items-start gap-3 bg-gray-800/40">
+      <div className="px-4 py-3.5 flex items-start gap-3 bg-app-s2/40">
         <span className="flex-shrink-0 bg-indigo-600 text-white text-[10px] font-bold tracking-widest px-1.5 py-1 rounded mt-1 uppercase">
           THEN
         </span>
@@ -611,7 +615,7 @@ function AutomationEditor({
           </div>
           <button
             onClick={addAction}
-            className="mt-2.5 flex items-center gap-1 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+            className="mt-2.5 flex items-center gap-1 text-xs text-app-t3/60 hover:text-app-t2 transition-colors"
           >
             <span className="text-sm leading-none">+</span> Add step
           </button>
@@ -620,22 +624,22 @@ function AutomationEditor({
 
       {/* ── Footer ── */}
       {saveError && (
-        <div className="px-4 py-2.5 bg-red-900/50 border-t border-red-700/60 text-sm text-red-300 flex items-start gap-2">
+        <div className="px-4 py-2.5 bg-app-dg/10 border-t border-app-dg/40 text-sm text-app-dg flex items-start gap-2">
           <span className="flex-shrink-0 mt-0.5">⚠</span>
           <span>{saveError}</span>
         </div>
       )}
-      <div className="px-4 py-3 flex justify-end gap-2 border-t border-gray-700/60 bg-gray-800/80">
+      <div className="px-4 py-3 flex justify-end gap-2 border-t border-app-ln/60 bg-app-s2/80">
         <button
           onClick={onCancel}
-          className="px-4 py-1.5 text-sm text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+          className="px-4 py-1.5 text-sm text-app-t3 hover:text-app-t1 bg-app-s3 hover:bg-app-s3/80 rounded-lg transition-colors"
         >
           Cancel
         </button>
         <button
           onClick={handleSave}
           disabled={saving || !canSave}
-          className="px-4 py-1.5 text-sm text-white font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 rounded-lg transition-colors"
+          className="px-4 py-1.5 text-sm text-app-ac-tx font-medium bg-app-ac hover:bg-app-ac/90 disabled:opacity-40 rounded-lg transition-colors"
         >
           {saving ? 'Saving…' : 'Save'}
         </button>
@@ -699,13 +703,13 @@ function ConditionRow({ cond, idx, scope = 'all', showScope = false, onScopeChan
       {idx > 0 && (
         <button
           onClick={() => onChange({ connector: connector === 'or' ? 'and' : 'or' })}
-          className="text-xs font-semibold mr-1 flex-shrink-0 px-1.5 py-0.5 rounded border transition-colors cursor-pointer select-none border-gray-600 text-gray-300 hover:border-violet-500 hover:text-violet-300 hover:bg-violet-900/20"
+          className="text-xs font-semibold mr-1 flex-shrink-0 px-1.5 py-0.5 rounded border transition-colors cursor-pointer select-none border-app-ln text-app-t2 hover:border-app-ac hover:text-app-ac hover:bg-app-ac/10"
           title="Click to toggle And / Or"
         >
           {connector === 'or' ? 'Or' : 'And'}
         </button>
       )}
-      <p className="text-sm text-gray-400 leading-8 flex-1 flex flex-wrap items-baseline">
+      <p className="text-sm text-app-t3 leading-8 flex-1 flex flex-wrap items-baseline">
         {showScope && (
           <Token
             value={scope}
@@ -796,10 +800,10 @@ function ConditionRow({ cond, idx, scope = 'all', showScope = false, onScopeChan
       {canRemove && (
         <button
           onClick={onRemove}
-          className="text-gray-600 hover:text-red-400 text-base leading-none flex-shrink-0 ml-1 transition-colors"
+          className="text-app-t3/40 hover:text-app-dg flex-shrink-0 ml-1 transition-colors"
           title="Remove condition"
         >
-          ×
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
         </button>
       )}
     </div>
@@ -834,7 +838,7 @@ function ActionRow({ action, boardId, allColumns, groups, allBoards, canRemove, 
 
   return (
     <div className="flex items-baseline gap-1">
-      <p className="text-sm text-gray-400 leading-8 flex-1 flex flex-wrap items-baseline">
+      <p className="text-sm text-app-t3 leading-8 flex-1 flex flex-wrap items-baseline">
         <Token
           value={action.type}
           onChange={v => onChange({ type: v as ActionDraft['type'], colId: '', value: '', groupId: '' })}
@@ -894,10 +898,10 @@ function ActionRow({ action, boardId, allColumns, groups, allBoards, canRemove, 
       {canRemove && (
         <button
           onClick={onRemove}
-          className="text-gray-600 hover:text-red-400 text-base leading-none flex-shrink-0 ml-1 transition-colors"
+          className="text-app-t3/40 hover:text-app-dg flex-shrink-0 ml-1 transition-colors"
           title="Remove action"
         >
-          ×
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
         </button>
       )}
     </div>

@@ -53,7 +53,7 @@ export function WorkspaceSwitcher({ workspaces, activeWorkspaceId }: WorkspaceSw
       <button
         ref={triggerRef}
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors truncate max-w-full"
+        className="flex items-center gap-1 text-xs text-app-t3 hover:text-app-t2 transition-colors truncate max-w-full"
         aria-label="Switch workspace"
       >
         <span className="truncate">{active?.workspace.name ?? ''}</span>
@@ -64,7 +64,7 @@ export function WorkspaceSwitcher({ workspaces, activeWorkspaceId }: WorkspaceSw
 
       {open && createPortal(
         <div
-          className="fixed z-50 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl py-1 overflow-hidden"
+          className="fixed z-50 bg-app-s1 border border-app-ln rounded-xl shadow-2xl py-1 overflow-hidden"
           style={{ top: pos.top, left: pos.left, minWidth: pos.width }}
           onMouseDown={e => e.stopPropagation()}
         >
@@ -72,19 +72,19 @@ export function WorkspaceSwitcher({ workspaces, activeWorkspaceId }: WorkspaceSw
             <button
               key={workspace.id}
               onClick={() => handleSwitch(workspace.id)}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-gray-800 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-app-s2 transition-colors"
             >
-              <span className={`w-4 flex-shrink-0 text-violet-400 ${workspace.id === activeWorkspaceId ? '' : 'invisible'}`}>✓</span>
-              <span className={`truncate ${workspace.id === activeWorkspaceId ? 'text-white font-medium' : 'text-gray-300'}`}>
+              <span className={`w-4 flex-shrink-0 text-app-ac ${workspace.id === activeWorkspaceId ? '' : 'invisible'}`}>✓</span>
+              <span className={`truncate ${workspace.id === activeWorkspaceId ? 'text-app-t1 font-medium' : 'text-app-t2'}`}>
                 {workspace.name}
               </span>
             </button>
           ))}
 
-          <div className="border-t border-gray-800 mt-1 pt-1">
+          <div className="border-t border-app-ln mt-1 pt-1">
             <button
               onClick={() => { setOpen(false); setShowModal(true); }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-left"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-app-t3 hover:text-app-t1 hover:bg-app-s2 transition-colors text-left"
             >
               <span className="w-4 text-center flex-shrink-0">+</span>
               New workspace
@@ -147,11 +147,13 @@ function NewWorkspaceModal({ onClose, onDone }: { onClose: () => void; onDone: (
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-6 mx-4">
+      <div className="w-full max-w-sm bg-app-s1 border border-app-ln rounded-xl shadow-2xl p-6 mx-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-white">New workspace</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors text-lg leading-none">✕</button>
+          <h2 className="text-base font-semibold text-app-t1">New workspace</h2>
+          <button onClick={onClose} className="text-app-t3 hover:text-app-t2 transition-colors flex items-center justify-center w-6 h-6">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+          </button>
         </div>
 
         {/* Tabs */}
@@ -159,14 +161,14 @@ function NewWorkspaceModal({ onClose, onDone }: { onClose: () => void; onDone: (
           <button
             type="button"
             onClick={() => handleModeChange('create')}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'create' ? 'bg-violet-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'create' ? 'bg-app-ac text-app-ac-tx' : 'bg-app-s2 text-app-t3 hover:text-app-t1'}`}
           >
             Create
           </button>
           <button
             type="button"
             onClick={() => handleModeChange('join')}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'join' ? 'bg-violet-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'join' ? 'bg-app-ac text-app-ac-tx' : 'bg-app-s2 text-app-t3 hover:text-app-t1'}`}
           >
             Join
           </button>
@@ -175,7 +177,7 @@ function NewWorkspaceModal({ onClose, onDone }: { onClose: () => void; onDone: (
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm text-app-t3 mb-1">
               {mode === 'create' ? 'Workspace name' : 'Invite link'}
             </label>
             <input
@@ -186,10 +188,10 @@ function NewWorkspaceModal({ onClose, onDone }: { onClose: () => void; onDone: (
               onChange={e => setValue(e.target.value)}
               required
               placeholder={mode === 'create' ? 'e.g. Acme Corp' : 'Paste invite link here'}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500"
+              className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-app-t1 text-sm focus:outline-none focus:border-app-ac"
             />
             {mode === 'join' && (
-              <p className="text-xs text-gray-600 mt-1">Ask your workspace owner to share their invite link from Settings.</p>
+              <p className="text-xs text-app-t3 mt-1">Ask your workspace owner to share their invite link from Settings.</p>
             )}
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -197,14 +199,14 @@ function NewWorkspaceModal({ onClose, onDone }: { onClose: () => void; onDone: (
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+              className="px-4 py-2 text-sm text-app-t3 hover:text-app-t1 transition-colors rounded-lg hover:bg-app-s2"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium bg-app-ac hover:bg-app-ac/90 disabled:opacity-50 text-app-ac-tx rounded-lg transition-colors"
             >
               {loading
                 ? (mode === 'create' ? 'Creating…' : 'Joining…')

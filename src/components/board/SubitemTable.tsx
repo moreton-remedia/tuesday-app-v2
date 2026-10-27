@@ -137,17 +137,17 @@ export function SubitemTable({ task, subitems, columns = [], boardId, groupColor
       className="pl-10"
       style={{ borderLeft: `3px solid ${groupColor}73` }}
     >
-      <div className="bg-gray-800/25 border-l border-gray-700/50">
+      <div className="bg-app-s2/25 border-l border-app-ln/50">
       <table className="border-collapse table-fixed w-full">
         <thead>
-          <tr className="border-b border-gray-700/70 bg-gray-800/70">
+          <tr className="border-b border-app-ln/70 bg-app-s2/70">
             <th className="px-3 py-1.5" style={{ width: 40 }}>
               <button
                 onClick={() => selectAllSubitems(subIds, boardId)}
                 className={`w-4 h-4 rounded border-2 transition-colors flex items-center justify-center ${
-                  allSubsSelected ? 'bg-violet-600 border-violet-600' :
-                  someSubsSelected ? 'border-violet-600 bg-transparent' :
-                  'border-gray-700 hover:border-gray-600'
+                  allSubsSelected ? 'bg-app-ac border-app-ac' :
+                  someSubsSelected ? 'border-app-ac bg-transparent' :
+                  'border-app-ln hover:border-app-t3'
                 }`}
                 aria-label="Select all subitems"
               >
@@ -156,7 +156,7 @@ export function SubitemTable({ task, subitems, columns = [], boardId, groupColor
               </button>
             </th>
             <th
-              className="relative px-3 py-1.5 text-left text-xs text-gray-500 font-medium pl-10 border-r border-gray-700 select-none"
+              className="relative px-3 py-1.5 text-left text-xs text-app-t3 font-medium pl-10 border-r border-app-ln select-none"
               style={{ width: subitemNameWidth }}
             >
               Subitem
@@ -184,14 +184,14 @@ export function SubitemTable({ task, subitems, columns = [], boardId, groupColor
                 onDragEnd={onColDragEnd}
               />
             ))}
-            <th className="px-2 py-1.5 relative border-l border-gray-700">
+            <th className="px-2 py-1.5 relative border-l border-app-ln">
               <button
                 ref={addColBtnRef}
                 onClick={() => {
                   setColPickerRect(addColBtnRef.current?.getBoundingClientRect() ?? null);
                   setShowColPicker(s => !s);
                 }}
-                className="text-gray-700 hover:text-gray-400 text-sm leading-none w-5 h-5 flex items-center justify-center rounded hover:bg-gray-700 transition-colors"
+                className="text-app-t3/40 hover:text-app-t2 text-sm leading-none w-5 h-5 flex items-center justify-center rounded hover:bg-app-s3 transition-colors"
                 title="Add subitem column"
               >
                 +
@@ -229,7 +229,7 @@ export function SubitemTable({ task, subitems, columns = [], boardId, groupColor
       </table>
       <button
         onClick={handleAddSubitem}
-        className="w-full text-left px-[58px] py-1.5 text-xs text-gray-600 hover:text-gray-400 hover:bg-gray-800/30 transition-colors"
+        className="w-full text-left px-[58px] py-1.5 text-xs text-app-t3/50 hover:text-app-t2 hover:bg-app-s2/30 transition-colors"
       >
         + Add subitem
       </button>
@@ -304,22 +304,24 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className={`group/subrow border-b border-gray-800/30 transition-colors ${
+      className={`group/subrow border-b border-app-ln/30 transition-colors ${
         isDragging ? 'opacity-40' :
-        isDragTarget ? 'bg-violet-900/20' :
-        selected ? 'bg-violet-950/30' :
-        'hover:bg-gray-800/20'
+        isDragTarget ? 'bg-app-ac/10' :
+        selected ? 'bg-app-ac/10' :
+        'hover:bg-app-s2/20'
       }`}
     >
       {/* Grip handle + selection checkbox */}
       <td className="px-3 py-1.5 w-10 relative">
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/subrow:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 select-none leading-none text-xs pointer-events-none">⠿</span>
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/subrow:opacity-40 cursor-grab active:cursor-grabbing text-app-t3 select-none pointer-events-none flex items-center">
+          <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/></svg>
+        </span>
         <button
           onClick={() => toggleSubitem(subitem.id, boardId)}
           className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${
             selected
-              ? 'bg-violet-600 border-violet-600 opacity-100'
-              : 'border-gray-700 opacity-0 group-hover/subrow:opacity-100'
+              ? 'bg-app-ac border-app-ac opacity-100'
+              : 'border-app-ln opacity-0 group-hover/subrow:opacity-100'
           }`}
           aria-label={selected ? 'Deselect subitem' : 'Select subitem'}
         >
@@ -344,14 +346,14 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
               handleDelete();
             }
           }}
-          className="bg-transparent text-xs w-full outline-none placeholder-gray-700 text-gray-300"
+          className="bg-transparent text-xs w-full outline-none placeholder-app-t3/40 text-app-t2"
           placeholder="Subitem name"
         />
       </td>
 
       {/* Custom column cells */}
       {columns.map((col, colIdx) => (
-        <td key={col.id} className={`border-l p-0 ${colIdx === 0 ? 'border-gray-700' : 'border-gray-800/30'}`}>
+        <td key={col.id} className={`border-l p-0 ${colIdx === 0 ? 'border-app-ln' : 'border-app-ln/30'}`}>
           <CellRenderer
             col={col}
             value={subitem.fields?.[col.id] ?? ''}
@@ -363,16 +365,16 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
       ))}
 
       {/* Add col spacer */}
-      <td className="px-2 py-1.5 border-l border-gray-700" />
+      <td className="px-2 py-1.5 border-l border-app-ln" />
 
       {/* Delete */}
       <td className="px-2 py-1.5 w-8">
         <button
           onClick={handleDelete}
-          className="text-gray-800 hover:text-red-400 transition-colors opacity-0 group-hover/subrow:opacity-100 text-base leading-none"
+          className="text-app-t3/30 hover:text-app-dg transition-colors opacity-0 group-hover/subrow:opacity-100 flex items-center justify-center"
           aria-label="Delete subitem"
         >
-          ×
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
         </button>
       </td>
     </tr>
@@ -451,22 +453,22 @@ function SubitemColumnPicker({
     <>
       <div className="fixed inset-0 z-[100]" onMouseDown={onClose} />
       <div
-        className="fixed z-[101] bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-3 w-56"
+        className="fixed z-[101] bg-app-s2 border border-app-ln rounded-xl shadow-xl p-3 w-56"
         style={style}
       >
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Add subitem column</p>
+        <p className="text-xs font-semibold text-app-t3 uppercase tracking-wider mb-2">Add subitem column</p>
         <div className="space-y-0.5">
           {COLUMN_TYPES.map(({ type, label, icon, desc }) => (
             <button
               key={type}
               onClick={() => handleCreate(type)}
               disabled={creating}
-              className="w-full text-left flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+              className="w-full text-left flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-app-s3 transition-colors disabled:opacity-50"
             >
-              <span className="w-5 flex-shrink-0 flex items-center justify-center text-gray-400">{icon}</span>
+              <span className="w-5 flex-shrink-0 flex items-center justify-center text-app-t3">{icon}</span>
               <div className="min-w-0">
-                <p className="text-sm text-white font-medium leading-tight">{label}</p>
-                <p className="text-xs text-gray-500 leading-tight">{desc}</p>
+                <p className="text-sm text-app-t1 font-medium leading-tight">{label}</p>
+                <p className="text-xs text-app-t3 leading-tight">{desc}</p>
               </div>
             </button>
           ))}

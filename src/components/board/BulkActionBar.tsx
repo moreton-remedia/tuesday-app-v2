@@ -59,26 +59,27 @@ export function BulkActionBar({ boardId, groups, boards }: BulkActionBarProps) {
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-gray-800 border border-gray-600 rounded-xl shadow-2xl px-5 py-3">
-        <span className="text-sm font-medium text-white">{buildLabel()}</span>
-        <div className="w-px h-4 bg-gray-600" />
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-app-s2 border border-app-ln rounded-xl shadow-2xl px-5 py-3">
+        <span className="text-sm font-medium text-app-t1">{buildLabel()}</span>
+        <div className="w-px h-4 bg-app-ln" />
         {taskCount > 0 && (
           <>
             <button
               onClick={() => setShowMoveModal(true)}
-              className="text-sm text-gray-300 hover:text-white transition-colors"
+              className="text-sm text-app-t2 hover:text-app-t1 transition-colors"
             >
               Move to…
             </button>
-            <div className="w-px h-4 bg-gray-600" />
+            <div className="w-px h-4 bg-app-ln" />
           </>
         )}
-        <button onClick={handleDelete} className="text-sm text-red-400 hover:text-red-300 transition-colors">
+        <button onClick={handleDelete} className="text-sm text-app-dg hover:text-app-dg/80 transition-colors">
           Delete
         </button>
-        <div className="w-px h-4 bg-gray-600" />
-        <button onClick={clearSelection} className="text-sm text-gray-400 hover:text-gray-200 transition-colors">
-          ✕ Clear
+        <div className="w-px h-4 bg-app-ln" />
+        <button onClick={clearSelection} className="text-sm text-app-t3 hover:text-app-t1 transition-colors flex items-center gap-1.5">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+          Clear
         </button>
       </div>
 
@@ -130,18 +131,18 @@ function MoveModal({ currentBoardId, currentGroups, boards, onMove, onClose }: {
     <>
       <div className="fixed inset-0 z-[200] bg-black/40" onMouseDown={onClose} />
       <div
-        className="fixed z-[201] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-5"
+        className="fixed z-[201] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 bg-app-s1 border border-app-ln rounded-xl shadow-2xl p-5"
         onMouseDown={e => e.stopPropagation()}
       >
-        <h3 className="text-sm font-semibold text-white mb-4">Move to group</h3>
+        <h3 className="text-sm font-semibold text-app-t1 mb-4">Move to group</h3>
 
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Board</label>
+            <label className="block text-xs text-app-t3 mb-1">Board</label>
             <select
               value={selectedBoardId}
               onChange={e => { setSelectedBoardId(e.target.value); setSelectedGroupId(''); }}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500"
+              className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac"
             >
               {boards.map(b => (
                 <option key={b.id} value={b.id}>
@@ -152,12 +153,12 @@ function MoveModal({ currentBoardId, currentGroups, boards, onMove, onClose }: {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Group</label>
+            <label className="block text-xs text-app-t3 mb-1">Group</label>
             <select
               value={selectedGroupId}
               onChange={e => setSelectedGroupId(e.target.value)}
               disabled={isFetching || (!isCurrent && !remoteBoardData)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500 disabled:opacity-50"
+              className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac disabled:opacity-50"
             >
               <option value="">{isFetching ? 'Loading…' : 'Select group…'}</option>
               {availableGroups.map(g => (
@@ -171,13 +172,13 @@ function MoveModal({ currentBoardId, currentGroups, boards, onMove, onClose }: {
           <button
             onClick={handleConfirm}
             disabled={!selectedGroupId || moving}
-            className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+            className="flex-1 bg-app-ac hover:bg-app-ac/90 disabled:opacity-50 text-app-ac-tx text-sm font-medium py-2 rounded-lg transition-colors"
           >
             {moving ? 'Moving…' : 'Move'}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium py-2 rounded-lg transition-colors"
+            className="flex-1 bg-app-s2 hover:bg-app-s3 text-app-t2 text-sm font-medium py-2 rounded-lg transition-colors"
           >
             Cancel
           </button>

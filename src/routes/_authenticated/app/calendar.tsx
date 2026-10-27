@@ -124,7 +124,7 @@ function CalendarPage() {
   }, [calData, boardInfos, firstDateColByBoard]);
 
   return (
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
+    <div className="flex h-screen bg-app-bg overflow-hidden">
       <Sidebar
         boards={boards ?? []}
         workspaces={workspaces ?? []}
@@ -229,19 +229,19 @@ function CalendarView({
   return (
     <div className="flex flex-1 min-w-0 overflow-hidden">
       {/* ── Board filter panel ── */}
-      <div className="w-44 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col overflow-y-auto">
-        <div className="p-3 border-b border-gray-800">
-          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Boards</p>
+      <div className="w-44 flex-shrink-0 bg-app-s1 border-r border-app-ln flex flex-col overflow-y-auto">
+        <div className="p-3 border-b border-app-ln">
+          <p className="text-[10px] font-semibold text-app-t3 uppercase tracking-wider">Boards</p>
         </div>
         <div className="p-2 space-y-0.5">
-          {boards.length === 0 && <p className="text-xs text-gray-600 px-1 py-2">No boards yet</p>}
+          {boards.length === 0 && <p className="text-xs text-app-t3/50 px-1 py-2">No boards yet</p>}
           {boards.map(board => {
             const visible = !hiddenBoards.has(board.id);
             return (
               <button
                 key={board.id}
                 onClick={() => toggleBoard(board.id)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-800 transition-colors text-left group"
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-app-s2 transition-colors text-left group"
               >
                 <span
                   className="w-3.5 h-3.5 rounded flex-shrink-0 flex items-center justify-center transition-colors border"
@@ -253,7 +253,7 @@ function CalendarView({
                     </svg>
                   )}
                 </span>
-                <span className={`text-xs truncate transition-colors ${visible ? 'text-gray-200 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-400'}`}>
+                <span className={`text-xs truncate transition-colors ${visible ? 'text-app-t1 group-hover:text-app-t1' : 'text-app-t3/50 group-hover:text-app-t3'}`}>
                   {board.name}
                 </span>
               </button>
@@ -265,11 +265,11 @@ function CalendarView({
       {/* ── Main calendar area ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-800 flex-shrink-0">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-app-ln flex-shrink-0">
           {/* New event button */}
           <button
             onClick={() => openCreate(toDateStr(new Date()))}
-            className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors flex-shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-app-ac hover:bg-app-ac/90 text-app-ac-tx rounded-lg transition-colors flex-shrink-0"
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M5 1v8M1 5h8" />
@@ -277,27 +277,27 @@ function CalendarView({
             New
           </button>
 
-          <button onClick={goToday} className="px-3 py-1 text-xs font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-colors">
+          <button onClick={goToday} className="px-3 py-1 text-xs font-medium bg-app-s2 hover:bg-app-s3 text-app-t2 hover:text-app-t1 rounded-lg transition-colors">
             Today
           </button>
-          <button onClick={goPrev} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-white transition-colors">
+          <button onClick={goPrev} className="p-1.5 rounded-lg hover:bg-app-s2 text-app-t3 hover:text-app-t1 transition-colors">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10 3L5 8l5 5" />
             </svg>
           </button>
-          <button onClick={goNext} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-white transition-colors">
+          <button onClick={goNext} className="p-1.5 rounded-lg hover:bg-app-s2 text-app-t3 hover:text-app-t1 transition-colors">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 3l5 5-5 5" />
             </svg>
           </button>
-          <h2 className="text-sm font-semibold text-white flex-1 select-none">{title}</h2>
+          <h2 className="text-sm font-semibold text-app-t1 flex-1 select-none">{title}</h2>
 
-          <div className="flex items-center bg-gray-800 rounded-lg p-0.5 gap-0.5">
+          <div className="flex items-center bg-app-s2 rounded-lg p-0.5 gap-0.5">
             {(['month', 'week', 'day'] as ViewMode[]).map(v => (
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors capitalize ${view === v ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors capitalize ${view === v ? 'bg-app-s3 text-app-t1' : 'text-app-t3 hover:text-app-t1'}`}
               >
                 {v}
               </button>
@@ -530,11 +530,13 @@ function NewEventModal({
       className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl mx-4 flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-sm bg-app-s1 border border-app-ln rounded-2xl shadow-2xl mx-4 flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-4 flex-shrink-0">
-          <h3 className="text-sm font-semibold text-white">New task</h3>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-400 transition-colors text-xl leading-none">×</button>
+          <h3 className="text-sm font-semibold text-app-t1">New task</h3>
+          <button onClick={onClose} className="text-app-t3 hover:text-app-t2 transition-colors flex items-center justify-center w-6 h-6">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+          </button>
         </div>
 
         {/* Scrollable body */}
@@ -542,7 +544,7 @@ function NewEventModal({
           {/* Task name */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs text-gray-500">Task name <span className="text-violet-500">*</span></label>
+              <label className="text-xs text-app-t3">Task name <span className="text-app-ac">*</span></label>
               {(() => {
                 const locCol = orderedBoardColumns.find(c => c.type === 'location' && fields[c.id]);
                 const locVal = locCol ? fields[locCol.id] : '';
@@ -550,7 +552,7 @@ function NewEventModal({
                   <button
                     type="button"
                     onClick={() => setName(locVal)}
-                    className="text-[10px] text-violet-400 hover:text-violet-300 transition-colors"
+                    className="text-[10px] text-app-ac hover:text-app-ac/80 transition-colors"
                   >
                     ← Use address as title
                   </button>
@@ -563,20 +565,20 @@ function NewEventModal({
               onChange={e => setName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && canCreate) handleCreate(); }}
               placeholder="What needs to be done?"
-              className="w-full bg-gray-800 border border-gray-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 outline-none transition-colors"
+              className="w-full bg-app-s2 border border-app-ln focus:border-app-ac rounded-lg px-3 py-2 text-sm text-app-t1 placeholder-app-t3/50 outline-none transition-colors"
             />
           </div>
 
           {/* Board */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Board</label>
+            <label className="block text-xs text-app-t3 mb-1">Board</label>
             {boards.length === 0 ? (
-              <p className="text-xs text-gray-600">No boards available</p>
+              <p className="text-xs text-app-t3/50">No boards available</p>
             ) : (
               <select
                 value={boardId}
                 onChange={e => setBoardId(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500 transition-colors"
+                className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac transition-colors"
               >
                 {boards.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
@@ -586,11 +588,11 @@ function NewEventModal({
           {/* Group — only shown when board has >1 group */}
           {boardGroups.length > 1 && (
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Group</label>
+              <label className="block text-xs text-app-t3 mb-1">Group</label>
               <select
                 value={groupId}
                 onChange={e => setGroupId(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500 transition-colors"
+                className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac transition-colors"
               >
                 {boardGroups.map(g => <option key={g.id} value={g.id}>{g.title}</option>)}
               </select>
@@ -605,10 +607,10 @@ function NewEventModal({
               notes: 'Notes', date: 'Date', dropdown: 'Dropdown', link: 'Link', location: 'Location',
             };
             return (
-              <div className="border-t border-gray-800 pt-3">
+              <div className="border-t border-app-ln pt-3">
                 {/* Section header */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
+                  <span className="text-[10px] font-semibold text-app-t3/60 uppercase tracking-wider">
                     Column details
                   </span>
                   <button
@@ -616,8 +618,8 @@ function NewEventModal({
                     onClick={() => setShowCustomize(s => !s)}
                     className={`flex items-center gap-1 text-[10px] font-medium transition-colors rounded px-1.5 py-0.5 ${
                       showCustomize
-                        ? 'bg-violet-600/20 text-violet-400'
-                        : 'text-gray-600 hover:text-gray-400 hover:bg-gray-800'
+                        ? 'bg-app-ac/20 text-app-ac'
+                        : 'text-app-t3 hover:text-app-t2 hover:bg-app-s2'
                     }`}
                     title="Choose which columns appear here"
                   >
@@ -630,7 +632,7 @@ function NewEventModal({
 
                 {showCustomize ? (
                   /* ── Customize mode: drag-to-reorder + visibility toggles ── */
-                  <div className="space-y-1 bg-gray-800/50 rounded-lg p-2">
+                  <div className="space-y-1 bg-app-s2/50 rounded-lg p-2">
                     {orderedBoardColumns.map(col => {
                       const visible = !hiddenSet.has(col.id);
                       return (
@@ -640,9 +642,9 @@ function NewEventModal({
                           onDragStart={() => { dragColRef.current = col.id; }}
                           onDragOver={e => e.preventDefault()}
                           onDrop={() => reorderCol(col.id, orderedBoardColumns)}
-                          className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-gray-800 group"
+                          className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-app-s2 group"
                         >
-                          <span className="cursor-grab text-gray-700 group-hover:text-gray-500 flex-shrink-0" title="Drag to reorder">
+                          <span className="cursor-grab text-app-t3/40 group-hover:text-app-t3 flex-shrink-0" title="Drag to reorder">
                             <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor">
                               <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
                               <circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/>
@@ -653,7 +655,7 @@ function NewEventModal({
                             className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors cursor-pointer"
                             style={{
                               backgroundColor: visible ? '#7c3aed' : 'transparent',
-                              borderColor: visible ? '#7c3aed' : '#4b5563',
+                              borderColor: visible ? '#7c3aed' : 'oklch(var(--c-ln))',
                             }}
                             onClick={() => toggleCol(col.id)}
                           >
@@ -664,12 +666,12 @@ function NewEventModal({
                             )}
                           </span>
                           <span
-                            className={`text-xs flex-1 transition-colors cursor-pointer ${visible ? 'text-gray-200' : 'text-gray-600'}`}
+                            className={`text-xs flex-1 transition-colors cursor-pointer ${visible ? 'text-app-t1' : 'text-app-t3/50'}`}
                             onClick={() => toggleCol(col.id)}
                           >
                             {col.label}
                           </span>
-                          <span className="text-[10px] text-gray-700 group-hover:text-gray-600 flex-shrink-0">
+                          <span className="text-[10px] text-app-t3/40 group-hover:text-app-t3 flex-shrink-0">
                             {typeLabel[col.type] ?? col.type}
                           </span>
                         </div>
@@ -681,9 +683,9 @@ function NewEventModal({
                   <button
                     type="button"
                     onClick={() => setShowCustomize(true)}
-                    className="w-full text-xs text-gray-700 hover:text-gray-500 transition-colors py-2 text-center"
+                    className="w-full text-xs text-app-t3/50 hover:text-app-t3 transition-colors py-2 text-center"
                   >
-                    All columns hidden — click <span className="text-violet-500">Customize</span> to show some
+                    All columns hidden — click <span className="text-app-ac">Customize</span> to show some
                   </button>
                 ) : (
                   /* ── Normal mode: visible column inputs in saved order ── */
@@ -705,39 +707,39 @@ function NewEventModal({
 
         {/* Footer — duplicate prompt or normal actions */}
         {duplicateOf ? (
-          <div className="px-5 py-4 border-t border-gray-800 flex-shrink-0 space-y-2.5">
-            <p className="text-xs text-gray-400">
-              A task named <span className="text-white font-medium">"{duplicateOf.name}"</span> already exists in this board. Click away to cancel.
+          <div className="px-5 py-4 border-t border-app-ln flex-shrink-0 space-y-2.5">
+            <p className="text-xs text-app-t3">
+              A task named <span className="text-app-t1 font-medium">"{duplicateOf.name}"</span> already exists in this board. Click away to cancel.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={handleUpdateOld}
                 disabled={creating}
-                className="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-gray-700 hover:bg-gray-600 disabled:opacity-40 rounded-lg transition-colors"
+                className="flex-1 px-3 py-1.5 text-xs font-medium text-app-t1 bg-app-s3 hover:bg-app-s3/80 disabled:opacity-40 rounded-lg transition-colors"
               >
                 {creating ? 'Updating…' : 'Update Old'}
               </button>
               <button
                 onClick={doCreate}
                 disabled={creating}
-                className="flex-1 px-3 py-1.5 text-xs font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white rounded-lg transition-colors"
+                className="flex-1 px-3 py-1.5 text-xs font-medium bg-app-ac hover:bg-app-ac/90 disabled:opacity-40 text-app-ac-tx rounded-lg transition-colors"
               >
                 {creating ? 'Creating…' : 'Create New'}
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-800 flex-shrink-0">
+          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-app-ln flex-shrink-0">
             <button
               onClick={onClose}
-              className="px-4 py-1.5 text-sm text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+              className="px-4 py-1.5 text-sm text-app-t3 hover:text-app-t1 transition-colors rounded-lg hover:bg-app-s2"
             >
               Cancel
             </button>
             <button
               onClick={handleCreate}
               disabled={!canCreate || creating}
-              className="px-4 py-1.5 text-sm font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              className="px-4 py-1.5 text-sm font-medium bg-app-ac hover:bg-app-ac/90 disabled:opacity-40 disabled:cursor-not-allowed text-app-ac-tx rounded-lg transition-colors"
             >
               {creating ? 'Creating…' : 'Create task'}
             </button>
@@ -902,7 +904,7 @@ function EventDetailModal({
       className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl mx-4 flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-sm bg-app-s1 border border-app-ln rounded-2xl shadow-2xl mx-4 flex flex-col max-h-[90vh]">
 
         {/* ── Header ── */}
         <div className="flex items-start gap-3 px-5 pt-5 pb-4 flex-shrink-0">
@@ -915,12 +917,12 @@ function EventDetailModal({
                 onChange={e => setEditName(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleSave(); }}
                 autoFocus
-                className="w-full text-base font-semibold text-white bg-transparent outline-none border-b border-gray-600 focus:border-violet-500 pb-0.5 transition-colors"
+                className="w-full text-base font-semibold text-app-t1 bg-transparent outline-none border-b border-app-ln focus:border-app-ac pb-0.5 transition-colors"
               />
             ) : (
-              <h3 className="text-base font-semibold text-white leading-snug break-words">{event.taskName}</h3>
+              <h3 className="text-base font-semibold text-app-t1 leading-snug break-words">{event.taskName}</h3>
             )}
-            <p className="text-xs text-gray-500 mt-0.5">{event.boardName}</p>
+            <p className="text-xs text-app-t3 mt-0.5">{event.boardName}</p>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             {!isEditing && (
@@ -932,7 +934,7 @@ function EventDetailModal({
                   setShowCustomize(false);
                   setIsEditing(true);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-app-t3 hover:text-app-t1 bg-app-s2 hover:bg-app-s3 rounded-lg transition-colors"
                 title="Edit this task"
               >
                 <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -941,7 +943,9 @@ function EventDetailModal({
                 Edit
               </button>
             )}
-            <button onClick={onClose} className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-gray-300 transition-colors text-xl leading-none rounded">×</button>
+            <button onClick={onClose} className="w-6 h-6 flex items-center justify-center text-app-t3 hover:text-app-t2 transition-colors rounded">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </button>
           </div>
         </div>
 
@@ -953,11 +957,11 @@ function EventDetailModal({
               {/* Group selector (only if >1 group) */}
               {boardGroups.length > 1 && (
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Group</label>
+                  <label className="block text-xs text-app-t3 mb-1">Group</label>
                   <select
                     value={editGroupId}
                     onChange={e => setEditGroupId(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500 transition-colors"
+                    className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac transition-colors"
                   >
                     {boardGroups.map(g => <option key={g.id} value={g.id}>{g.title}</option>)}
                   </select>
@@ -966,14 +970,14 @@ function EventDetailModal({
 
               {/* Column fields */}
               {orderedBoardColumns.length > 0 && (
-                <div className="border-t border-gray-800 pt-3">
+                <div className="border-t border-app-ln pt-3">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Column details</span>
+                    <span className="text-[10px] font-semibold text-app-t3/60 uppercase tracking-wider">Column details</span>
                     <button
                       type="button"
                       onClick={() => setShowCustomize(s => !s)}
                       className={`flex items-center gap-1 text-[10px] font-medium transition-colors rounded px-1.5 py-0.5 ${
-                        showCustomize ? 'bg-violet-600/20 text-violet-400' : 'text-gray-600 hover:text-gray-400 hover:bg-gray-800'
+                        showCustomize ? 'bg-app-ac/20 text-app-ac' : 'text-app-t3 hover:text-app-t2 hover:bg-app-s2'
                       }`}
                     >
                       <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor">
@@ -984,7 +988,7 @@ function EventDetailModal({
                   </div>
 
                   {showCustomize ? (
-                    <div className="space-y-1 bg-gray-800/50 rounded-lg p-2">
+                    <div className="space-y-1 bg-app-s2/50 rounded-lg p-2">
                       {(() => {
                         const typeLabel: Record<string, string> = { notes: 'Notes', date: 'Date', dropdown: 'Dropdown', status: 'Status', link: 'Link', location: 'Location' };
                         return orderedBoardColumns.map(col => {
@@ -996,9 +1000,9 @@ function EventDetailModal({
                               onDragStart={() => { dragColRef.current = col.id; }}
                               onDragOver={e => e.preventDefault()}
                               onDrop={() => reorderCol(col.id, orderedBoardColumns)}
-                              className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-gray-800 group"
+                              className="flex items-center gap-2.5 px-1 py-1.5 rounded-md hover:bg-app-s2 group"
                             >
-                              <span className="cursor-grab text-gray-700 group-hover:text-gray-500 flex-shrink-0" title="Drag to reorder">
+                              <span className="cursor-grab text-app-t3/40 group-hover:text-app-t3 flex-shrink-0" title="Drag to reorder">
                                 <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor">
                                   <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
                                   <circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/>
@@ -1007,7 +1011,7 @@ function EventDetailModal({
                               </span>
                               <span
                                 className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-colors cursor-pointer"
-                                style={{ backgroundColor: visible ? '#7c3aed' : 'transparent', borderColor: visible ? '#7c3aed' : '#4b5563' }}
+                                style={{ backgroundColor: visible ? '#7c3aed' : 'transparent', borderColor: visible ? '#7c3aed' : 'oklch(var(--c-ln))' }}
                                 onClick={() => toggleCol(col.id)}
                               >
                                 {visible && (
@@ -1016,18 +1020,18 @@ function EventDetailModal({
                                   </svg>
                                 )}
                               </span>
-                              <span className={`text-xs flex-1 transition-colors cursor-pointer ${visible ? 'text-gray-200' : 'text-gray-600'}`} onClick={() => toggleCol(col.id)}>
+                              <span className={`text-xs flex-1 transition-colors cursor-pointer ${visible ? 'text-app-t1' : 'text-app-t3/50'}`} onClick={() => toggleCol(col.id)}>
                                 {col.label}
                               </span>
-                              <span className="text-[10px] text-gray-700 flex-shrink-0">{typeLabel[col.type] ?? col.type}</span>
+                              <span className="text-[10px] text-app-t3/40 flex-shrink-0">{typeLabel[col.type] ?? col.type}</span>
                             </div>
                           );
                         });
                       })()}
                     </div>
                   ) : visibleEditCols.length === 0 ? (
-                    <button type="button" onClick={() => setShowCustomize(true)} className="w-full text-xs text-gray-700 hover:text-gray-500 transition-colors py-2 text-center">
-                      All columns hidden — click <span className="text-violet-500">Customize</span> to show some
+                    <button type="button" onClick={() => setShowCustomize(true)} className="w-full text-xs text-app-t3/50 hover:text-app-t3 transition-colors py-2 text-center">
+                      All columns hidden — click <span className="text-app-ac">Customize</span> to show some
                     </button>
                   ) : (
                     <div className="space-y-3">
@@ -1048,19 +1052,19 @@ function EventDetailModal({
             /* ── View mode body ── */
             <div className="space-y-2.5">
               {populatedCols.length === 0 ? (
-                <p className="text-xs text-gray-600 py-2">No field values set for this task.</p>
+                <p className="text-xs text-app-t3/50 py-2">No field values set for this task.</p>
               ) : (
                 populatedCols.map(col => {
                   const raw = taskFields[col.id] ?? '';
                   return (
                     <div key={col.id} className="flex items-start gap-3">
-                      <span className="text-xs text-gray-600 w-24 flex-shrink-0 pt-0.5">{col.label}</span>
+                      <span className="text-xs text-app-t3 w-24 flex-shrink-0 pt-0.5">{col.label}</span>
                       <div className="flex-1 min-w-0">
                         {col.type === 'date' && (
-                          <span className="text-xs text-gray-200">{formatDateValue(raw)}</span>
+                          <span className="text-xs text-app-t1">{formatDateValue(raw)}</span>
                         )}
                         {col.type === 'notes' && (
-                          <span className="text-xs text-gray-300 whitespace-pre-wrap break-words">{raw}</span>
+                          <span className="text-xs text-app-t2 whitespace-pre-wrap break-words">{raw}</span>
                         )}
                         {col.type === 'dropdown' && (() => {
                           const opt = (col.options as { label: string; colorKey?: string }[] ?? []).find(o => o.label === raw);
@@ -1085,19 +1089,19 @@ function EventDetailModal({
                           ) : null;
                         })()}
                         {col.type === 'link' && raw && (
-                          <span className="text-xs text-blue-400 flex items-center gap-1">
+                          <span className="text-xs text-app-ac flex items-center gap-1">
                             <span>↗</span>
                             <span className="truncate">{resolveLinkedTaskName(raw)}</span>
                           </span>
                         )}
                         {col.type === 'location' && raw && (
-                          <span className="text-xs text-gray-300 flex items-center gap-1">
-                            <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-gray-500 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                          <span className="text-xs text-app-t2 flex items-center gap-1">
+                            <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-app-t3 flex-shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                             <span className="truncate">{raw}</span>
                           </span>
                         )}
                         {col.type === 'formula' && (
-                          <span className="text-xs text-gray-400 font-mono">{raw}</span>
+                          <span className="text-xs text-app-t3 font-mono">{raw}</span>
                         )}
                       </div>
                     </div>
@@ -1109,11 +1113,11 @@ function EventDetailModal({
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center px-5 py-3.5 border-t border-gray-800 flex-shrink-0 gap-2">
+        <div className="flex items-center px-5 py-3.5 border-t border-app-ln flex-shrink-0 gap-2">
           {/* Go to board — always visible */}
           <button
             onClick={() => navigate({ to: '/app/board/$boardId', params: { boardId: event.boardId } })}
-            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-violet-400 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-app-t3 hover:text-app-ac transition-colors"
             title="Open this board"
           >
             <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1126,14 +1130,14 @@ function EventDetailModal({
             <div className="flex items-center gap-2 ml-auto">
               <button
                 onClick={() => setIsEditing(false)}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+                className="px-3 py-1.5 text-xs text-app-t3 hover:text-app-t1 transition-colors rounded-lg hover:bg-app-s2"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={!editName.trim() || saving}
-                className="px-4 py-1.5 text-xs font-medium bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="px-4 py-1.5 text-xs font-medium bg-app-ac hover:bg-app-ac/90 disabled:opacity-40 disabled:cursor-not-allowed text-app-ac-tx rounded-lg transition-colors"
               >
                 {saving ? 'Saving…' : 'Save changes'}
               </button>
@@ -1229,7 +1233,7 @@ function LocationField({ value, onChange }: { value: string; onChange: (v: strin
         value={draft}
         onChange={e => handleInput(e.target.value)}
         placeholder={CAL_MAPS_KEY ? 'Search for an address…' : 'Enter an address…'}
-        className="w-full bg-gray-800 border border-gray-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 outline-none transition-colors"
+        className="w-full bg-app-s2 border border-app-ln focus:border-app-ac rounded-lg px-3 py-2 text-sm text-app-t1 placeholder-app-t3/50 outline-none transition-colors"
         onKeyDown={e => {
           if (e.key === 'Enter' && suggestions.length > 0) { e.preventDefault(); selectSuggestion(suggestions[0]); }
           if (e.key === 'Escape') setSuggestions([]);
@@ -1237,16 +1241,16 @@ function LocationField({ value, onChange }: { value: string; onChange: (v: strin
         onBlur={() => setTimeout(() => setSuggestions([]), 150)}
       />
       {suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 z-10 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 z-10 bg-app-s2 border border-app-ln rounded-lg shadow-xl overflow-hidden">
           {suggestions.map((s, i) => (
             <button
               key={i}
               type="button"
               onMouseDown={e => e.preventDefault()}
               onClick={() => selectSuggestion(s)}
-              className="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+              className="w-full text-left px-3 py-2 text-xs text-app-t2 hover:bg-app-s3 flex items-center gap-2"
             >
-              <span className="text-gray-500 flex-shrink-0">
+              <span className="text-app-t3 flex-shrink-0">
                 <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
               </span>
               <span className="truncate">{s.placePrediction.text.text}</span>
@@ -1263,14 +1267,14 @@ function LocationField({ value, onChange }: { value: string; onChange: (v: strin
 function ColumnField({ col, value, onChange }: { col: CalColumn; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="block text-xs text-gray-500 mb-1">{col.label}</label>
+      <label className="block text-xs text-app-t3 mb-1">{col.label}</label>
       {col.type === 'notes' && (
         <textarea
           value={value}
           onChange={e => onChange(e.target.value)}
           rows={2}
           placeholder="Add a note…"
-          className="w-full bg-gray-800 border border-gray-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 outline-none transition-colors resize-none"
+          className="w-full bg-app-s2 border border-app-ln focus:border-app-ac rounded-lg px-3 py-2 text-sm text-app-t1 placeholder-app-t3/50 outline-none transition-colors resize-none"
         />
       )}
       {col.type === 'date' && (
@@ -1280,7 +1284,7 @@ function ColumnField({ col, value, onChange }: { col: CalColumn; value: string; 
         <select
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500 transition-colors"
+          className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac transition-colors"
         >
           <option value="">— None —</option>
           {(col.options as { label: string }[] ?? []).map(opt => (
@@ -1292,7 +1296,7 @@ function ColumnField({ col, value, onChange }: { col: CalColumn; value: string; 
         <select
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-violet-500 transition-colors"
+          className="w-full bg-app-s2 border border-app-ln rounded-lg px-3 py-2 text-sm text-app-t1 outline-none focus:border-app-ac transition-colors"
         >
           <option value="">— None —</option>
           {(col.statusOptions as { key: string; label: string }[] ?? []).map(opt => (
@@ -1368,25 +1372,27 @@ function LinkColumnField({ col, value, onChange }: { col: CalColumn; value: stri
       <button
         type="button"
         onClick={() => setIsOpen(o => !o)}
-        className={`w-full flex items-center gap-2 bg-gray-800 border rounded-lg px-3 py-2 text-sm text-left transition-colors ${
-          isOpen ? 'border-violet-500' : 'border-gray-700 hover:border-gray-600'
+        className={`w-full flex items-center gap-2 bg-app-s2 border rounded-lg px-3 py-2 text-sm text-left transition-colors ${
+          isOpen ? 'border-app-ac' : 'border-app-ln hover:border-app-t3'
         }`}
       >
         {selectedTask ? (
           <>
-            <span className="text-blue-400 flex-shrink-0 text-xs">↗</span>
-            <span className="text-gray-200 truncate flex-1 text-xs">{selectedTask.name || '(unnamed)'}</span>
+            <span className="text-app-ac flex-shrink-0 text-xs">↗</span>
+            <span className="text-app-t1 truncate flex-1 text-xs">{selectedTask.name || '(unnamed)'}</span>
             <span
               role="button"
               onClick={e => { e.stopPropagation(); onChange(''); }}
-              className="text-gray-600 hover:text-red-400 transition-colors text-base leading-none flex-shrink-0 cursor-pointer"
+              className="text-app-t3 hover:text-app-dg transition-colors flex items-center flex-shrink-0 cursor-pointer"
               title="Clear"
-            >×</span>
+            >
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </span>
           </>
         ) : (
           <>
-            <span className="text-gray-600 flex-1 text-xs">Link item…</span>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={`text-gray-600 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+            <span className="text-app-t3/50 flex-1 text-xs">Link item…</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={`text-app-t3 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
               <path d="M2 3.5l3 3 3-3"/>
             </svg>
           </>
@@ -1395,10 +1401,10 @@ function LinkColumnField({ col, value, onChange }: { col: CalColumn; value: stri
 
       {/* ── Dropdown ── */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 z-10 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 z-10 bg-app-s2 border border-app-ln rounded-lg shadow-xl overflow-hidden">
           {/* Search */}
-          <div className="flex items-center gap-2 px-2.5 py-1.5 border-b border-gray-700">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-gray-600 flex-shrink-0">
+          <div className="flex items-center gap-2 px-2.5 py-1.5 border-b border-app-ln">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-app-t3 flex-shrink-0">
               <circle cx="7" cy="7" r="5"/><path d="M12 12l3 3"/>
             </svg>
             <input
@@ -1407,14 +1413,14 @@ function LinkColumnField({ col, value, onChange }: { col: CalColumn; value: stri
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => { if (e.key === 'Escape') setIsOpen(false); }}
               placeholder="Search items…"
-              className="flex-1 bg-transparent text-xs text-white placeholder-gray-600 outline-none"
+              className="flex-1 bg-transparent text-xs text-app-t1 placeholder-app-t3/50 outline-none"
             />
           </div>
           {/* Items */}
           <div className="max-h-40 overflow-y-auto">
-            {isLoading && <p className="text-xs text-gray-600 px-3 py-2 text-center">Loading…</p>}
+            {isLoading && <p className="text-xs text-app-t3/50 px-3 py-2 text-center">Loading…</p>}
             {!isLoading && filtered.length === 0 && (
-              <p className="text-xs text-gray-600 px-3 py-2 text-center">
+              <p className="text-xs text-app-t3/50 px-3 py-2 text-center">
                 {search ? 'No items match' : 'No items in this board'}
               </p>
             )}
@@ -1424,7 +1430,7 @@ function LinkColumnField({ col, value, onChange }: { col: CalColumn; value: stri
                 type="button"
                 onClick={() => select(task.id)}
                 className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center gap-2 ${
-                  task.id === value ? 'bg-violet-600/20 text-violet-300' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  task.id === value ? 'bg-app-ac/20 text-app-ac' : 'text-app-t2 hover:bg-app-s3 hover:text-app-t1'
                 }`}
               >
                 {task.id === value
@@ -1459,14 +1465,14 @@ function DateTimeField({ value, onChange }: { value: string; onChange: (v: strin
         type="date"
         value={datePart}
         onChange={e => update(e.target.value, timePart)}
-        className="flex-1 bg-gray-800 border border-gray-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors"
+        className="flex-1 bg-app-s2 border border-app-ln focus:border-app-ac rounded-lg px-3 py-2 text-sm text-app-t1 outline-none transition-colors"
       />
       <input
         type="time"
         value={timePart}
         onChange={e => update(datePart, e.target.value)}
         placeholder="--:--"
-        className="w-28 bg-gray-800 border border-gray-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors"
+        className="w-28 bg-app-s2 border border-app-ln focus:border-app-ac rounded-lg px-3 py-2 text-sm text-app-t1 outline-none transition-colors"
       />
     </div>
   );
@@ -1500,10 +1506,10 @@ function MonthView({ date, events, onTaskClick, onDayClick, onCreateEvent }: {
     <div className="h-full flex flex-col p-3 gap-1">
       <div className="grid grid-cols-7">
         {DAY_NAMES.map(n => (
-          <div key={n} className="text-center text-[10px] font-semibold text-gray-600 uppercase tracking-wider py-1">{n}</div>
+          <div key={n} className="text-center text-[10px] font-semibold text-app-t3 uppercase tracking-wider py-1">{n}</div>
         ))}
       </div>
-      <div className="grid grid-cols-7 grid-rows-6 flex-1 gap-px bg-gray-800 rounded-lg overflow-hidden">
+      <div className="grid grid-cols-7 grid-rows-6 flex-1 gap-px bg-app-ln rounded-lg overflow-hidden">
         {cells.map(cell => (
           <MonthCell
             key={cell.str}
@@ -1531,14 +1537,14 @@ function MonthCell({ cell, onTaskClick, onDayClick, onCreateEvent }: {
 
   return (
     <div
-      className={`group/cell bg-gray-950 p-1.5 flex flex-col gap-0.5 overflow-hidden min-h-0 cursor-pointer ${cell.isCurrentMonth ? '' : 'opacity-25'}`}
+      className={`group/cell bg-app-bg p-1.5 flex flex-col gap-0.5 overflow-hidden min-h-0 cursor-pointer ${cell.isCurrentMonth ? '' : 'opacity-25'}`}
       onClick={onCreateEvent}
     >
       {/* Date row: number (navigates to day) + hover "+" button */}
       <div className="flex items-center justify-between flex-shrink-0">
         <button
           onClick={e => { e.stopPropagation(); onCreateEvent(); }}
-          className="opacity-0 group-hover/cell:opacity-100 w-4 h-4 rounded flex items-center justify-center text-gray-600 hover:text-white hover:bg-gray-700 transition-all text-xs leading-none"
+          className="opacity-0 group-hover/cell:opacity-100 w-4 h-4 rounded flex items-center justify-center text-app-t3 hover:text-app-t1 hover:bg-app-s3 transition-all text-xs leading-none"
           title="Add task"
         >
           +
@@ -1546,7 +1552,7 @@ function MonthCell({ cell, onTaskClick, onDayClick, onCreateEvent }: {
         <button
           onClick={e => { e.stopPropagation(); onDayClick(); }}
           className={`text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium transition-colors ${
-            cell.isToday ? 'bg-violet-600 text-white' : 'text-gray-500 hover:text-white hover:bg-gray-800'
+            cell.isToday ? 'bg-app-ac text-app-ac-tx' : 'text-app-t3 hover:text-app-t1 hover:bg-app-s2'
           }`}
         >
           {cell.date.getDate()}
@@ -1559,7 +1565,7 @@ function MonthCell({ cell, onTaskClick, onDayClick, onCreateEvent }: {
       {overflow > 0 && (
         <button
           onClick={e => { e.stopPropagation(); onDayClick(); }}
-          className="text-[10px] text-gray-600 hover:text-gray-400 text-left px-1 leading-tight transition-colors"
+          className="text-[10px] text-app-t3 hover:text-app-t2 text-left px-1 leading-tight transition-colors"
         >
           +{overflow} more
         </button>
@@ -1590,22 +1596,22 @@ function WeekView({ date, events, onTaskClick, onDayClick, onCreateEvent }: {
 
   return (
     <div className="h-full p-3">
-      <div className="grid grid-cols-7 gap-px bg-gray-800 rounded-lg overflow-hidden h-full">
+      <div className="grid grid-cols-7 gap-px bg-app-ln rounded-lg overflow-hidden h-full">
         {days.map(day => (
           <div
             key={day.str}
-            className="group/col bg-gray-950 flex flex-col overflow-hidden cursor-pointer"
+            className="group/col bg-app-bg flex flex-col overflow-hidden cursor-pointer"
             onClick={() => onCreateEvent(day.str)}
           >
             {/* Column header */}
-            <div className="px-2 py-2 border-b border-gray-800 flex-shrink-0 text-center" onClick={e => e.stopPropagation()}>
-              <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
+            <div className="px-2 py-2 border-b border-app-ln flex-shrink-0 text-center" onClick={e => e.stopPropagation()}>
+              <p className="text-[10px] font-semibold text-app-t3 uppercase tracking-wider">
                 {day.date.toLocaleDateString(undefined, { weekday: 'short' })}
               </p>
               <button
                 onClick={() => onDayClick(day.date)}
                 className={`text-base font-bold mt-0.5 w-8 h-8 mx-auto flex items-center justify-center rounded-full transition-colors ${
-                  day.isToday ? 'bg-violet-600 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  day.isToday ? 'bg-app-ac text-app-ac-tx' : 'text-app-t2 hover:text-app-t1 hover:bg-app-s2'
                 }`}
               >
                 {day.date.getDate()}
@@ -1618,7 +1624,7 @@ function WeekView({ date, events, onTaskClick, onDayClick, onCreateEvent }: {
               ))}
               {/* Hover add hint */}
               <div className="opacity-0 group-hover/col:opacity-100 transition-opacity absolute inset-0 flex items-end justify-center pb-2 pointer-events-none">
-                <span className="text-[10px] text-gray-700 flex items-center gap-0.5">
+                <span className="text-[10px] text-app-t3/40 flex items-center gap-0.5">
                   <span className="text-xs">+</span> Add task
                 </span>
               </div>
@@ -1647,14 +1653,14 @@ function DayView({ date, events, onTaskClick, onCreateEvent }: {
         {/* Add task button at the top */}
         <button
           onClick={() => onCreateEvent(dateStr)}
-          className="w-full flex items-center gap-2 px-4 py-3 mb-3 rounded-xl border border-dashed border-gray-700 hover:border-violet-500/50 hover:bg-violet-950/20 text-gray-600 hover:text-violet-400 transition-colors text-sm group"
+          className="w-full flex items-center gap-2 px-4 py-3 mb-3 rounded-xl border border-dashed border-app-ln hover:border-app-ac/50 hover:bg-app-ac/10 text-app-t3 hover:text-app-ac transition-colors text-sm group"
         >
           <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-xs flex-shrink-0 group-hover:border-violet-400">+</span>
           Add task for this day
         </button>
 
         {dayEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-gray-700">
+          <div className="flex flex-col items-center justify-center h-32 text-app-t3/40">
             <p className="text-sm">No tasks scheduled</p>
           </div>
         ) : (
@@ -1663,14 +1669,14 @@ function DayView({ date, events, onTaskClick, onCreateEvent }: {
               <button
                 key={evt.taskId}
                 onClick={() => onTaskClick(evt)}
-                className="w-full flex items-center gap-3 p-3 bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-xl text-left transition-colors group"
+                className="w-full flex items-center gap-3 p-3 bg-app-s1 border border-app-ln hover:border-app-t3 rounded-xl text-left transition-colors group"
               >
                 <div className="w-1 self-stretch rounded-full flex-shrink-0" style={{ backgroundColor: evt.color }} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">{evt.taskName}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">{evt.boardName}</p>
+                  <p className="text-sm font-medium text-app-t2 group-hover:text-app-t1 truncate">{evt.taskName}</p>
+                  <p className="text-xs text-app-t3 mt-0.5">{evt.boardName}</p>
                 </div>
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700 group-hover:text-gray-400 flex-shrink-0">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-app-t3/40 group-hover:text-app-t2 flex-shrink-0">
                   <path d="M6 3l5 5-5 5" />
                 </svg>
               </button>

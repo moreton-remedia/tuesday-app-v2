@@ -49,28 +49,28 @@ function JoinPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
+    <div className="min-h-screen flex items-center justify-center bg-app-bg">
       <div className="w-full max-w-sm px-4">
-        <h1 className="text-3xl font-bold text-white text-center mb-8">Tuesday</h1>
+        <h1 className="text-3xl font-bold text-app-t1 text-center mb-8">Tuesday</h1>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8">
+        <div className="bg-app-s1 border border-app-ln rounded-xl p-8">
           {stage.type === 'loading' && (
-            <p className="text-gray-400 text-sm text-center">Checking invite link…</p>
+            <p className="text-app-t3 text-sm text-center">Checking invite link…</p>
           )}
 
           {stage.type === 'confirm' && (
             <div className="text-center">
-              <p className="text-gray-400 text-sm mb-1">You've been invited to join</p>
-              <p className="text-white text-xl font-semibold mb-6">{stage.workspaceName}</p>
+              <p className="text-app-t3 text-sm mb-1">You've been invited to join</p>
+              <p className="text-app-t1 text-xl font-semibold mb-6">{stage.workspaceName}</p>
               <button
                 onClick={handleJoin}
-                className="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-2 rounded-lg text-sm transition-colors"
+                className="w-full bg-app-ac hover:bg-app-ac/90 text-app-ac-tx font-medium py-2 rounded-lg text-sm transition-colors"
               >
                 Join workspace
               </button>
               <button
                 onClick={() => router.navigate({ to: '/app' })}
-                className="mt-3 w-full text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                className="mt-3 w-full text-sm text-app-t3 hover:text-app-t2 transition-colors"
               >
                 No thanks, go to my workspace
               </button>
@@ -78,19 +78,19 @@ function JoinPage() {
           )}
 
           {stage.type === 'joining' && (
-            <p className="text-gray-400 text-sm text-center">Joining…</p>
+            <p className="text-app-t3 text-sm text-center">Joining…</p>
           )}
 
           {stage.type === 'done' && (
-            <p className="text-gray-400 text-sm text-center">Joined! Redirecting…</p>
+            <p className="text-app-t3 text-sm text-center">Joined! Redirecting…</p>
           )}
 
           {stage.type === 'error' && (
             <div className="text-center">
-              <p className="text-red-400 text-sm mb-4">{stage.message}</p>
+              <p className="text-app-dg text-sm mb-4">{stage.message}</p>
               <a
                 href="/app"
-                className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
+                className="text-sm text-app-ac hover:text-app-ac/80 transition-colors"
               >
                 Go to your workspace
               </a>

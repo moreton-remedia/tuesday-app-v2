@@ -23,7 +23,7 @@ function CellPopover({ anchorRect, onClose, children, width = 200 }: CellPopover
     <>
       <div className="fixed inset-0 z-[100]" onMouseDown={onClose} />
       <div
-        className="fixed z-[101] bg-gray-800 border border-gray-700 rounded-lg shadow-xl"
+        className="fixed z-[101] bg-app-s2 border border-app-ln rounded-lg shadow-xl"
         style={{ top, left, width }}
       >
         {children}
@@ -82,9 +82,9 @@ function NotesCell({ value, onChange }: { value: string; onChange: (v: string) =
       <div
         ref={triggerRef}
         onClick={open}
-        className="px-2 py-1.5 text-xs text-gray-300 truncate cursor-pointer hover:bg-gray-700/50 rounded min-h-[30px]"
+        className="px-2 py-1.5 text-xs text-app-t2 truncate cursor-pointer hover:bg-app-s3/50 rounded min-h-[30px]"
       >
-        {value || <span className="text-gray-600">Note…</span>}
+        {value || <span className="text-app-t3/50">Note…</span>}
       </div>
       {anchorRect && (
         <CellPopover anchorRect={anchorRect} onClose={close} width={256}>
@@ -95,7 +95,7 @@ function NotesCell({ value, onChange }: { value: string; onChange: (v: string) =
               onKeyDown={e => { if (e.key === 'Escape') close(); }}
               autoFocus
               rows={4}
-              className="w-full bg-transparent text-sm text-white outline-none resize-none placeholder-gray-600"
+              className="w-full bg-transparent text-sm text-app-t1 outline-none resize-none placeholder-app-t3/50"
               placeholder="Add a note…"
             />
           </div>
@@ -137,7 +137,7 @@ function DropdownCell({
             {selected.label}
           </span>
         ) : (
-          <span className="text-gray-700 text-xs">—</span>
+          <span className="text-app-t3/40 text-xs">—</span>
         )}
       </button>
       {anchorRect && (
@@ -146,25 +146,25 @@ function DropdownCell({
             {value && (
               <button
                 onClick={() => { onChange(''); setAnchorRect(null); }}
-                className="w-full text-left px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-700 hover:text-gray-300"
+                className="w-full text-left px-3 py-1.5 text-xs text-app-t3 hover:bg-app-s3 hover:text-app-t2"
               >
                 Clear
               </button>
             )}
             {options.length === 0 && (
-              <p className="px-3 py-2 text-xs text-gray-600">No options yet</p>
+              <p className="px-3 py-2 text-xs text-app-t3/50">No options yet</p>
             )}
             {options.map(opt => (
               <button
                 key={opt.label}
                 onClick={() => { onChange(opt.label); setAnchorRect(null); }}
-                className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-700 flex items-center gap-2"
+                className="w-full text-left px-3 py-1.5 text-xs hover:bg-app-s3 flex items-center gap-2"
               >
                 <span
                   className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: getColor(opt.colorKey) }}
                 />
-                <span className="text-gray-200">{opt.label}</span>
+                <span className="text-app-t1">{opt.label}</span>
               </button>
             ))}
           </div>
@@ -217,7 +217,7 @@ function DateCell({ value, onChange }: { value: string; onChange: (v: string) =>
           onBlur={commitEdit}
           onKeyDown={e => { if (e.key === 'Escape') setEditing(false); if (e.key === 'Enter') commitEdit(); }}
           autoFocus
-          className="bg-gray-800 text-xs text-white border border-gray-600 rounded px-1 py-0.5 outline-none flex-1 min-w-0"
+          className="bg-app-s2 text-xs text-app-t1 border border-app-ln rounded px-1 py-0.5 outline-none flex-1 min-w-0"
         />
         <input
           type="time"
@@ -225,7 +225,7 @@ function DateCell({ value, onChange }: { value: string; onChange: (v: string) =>
           onChange={e => setEditTime(e.target.value)}
           onBlur={commitEdit}
           onKeyDown={e => { if (e.key === 'Escape') setEditing(false); if (e.key === 'Enter') commitEdit(); }}
-          className="bg-gray-800 text-xs text-white border border-gray-600 rounded px-1 py-0.5 outline-none w-20 flex-shrink-0"
+          className="bg-app-s2 text-xs text-app-t1 border border-app-ln rounded px-1 py-0.5 outline-none w-20 flex-shrink-0"
         />
       </div>
     );
@@ -234,9 +234,9 @@ function DateCell({ value, onChange }: { value: string; onChange: (v: string) =>
   return (
     <div
       onClick={openEdit}
-      className="px-2 py-1.5 text-xs cursor-pointer hover:bg-gray-700/50 rounded min-h-[30px] flex items-center text-gray-300"
+      className="px-2 py-1.5 text-xs cursor-pointer hover:bg-app-s3/50 rounded min-h-[30px] flex items-center text-app-t2"
     >
-      {formatDisplay(value) ?? <span className="text-gray-700">—</span>}
+      {formatDisplay(value) ?? <span className="text-app-t3/40">—</span>}
     </div>
   );
 }
@@ -273,7 +273,7 @@ function StatusCell({
             {current.label}
           </span>
         ) : (
-          <span className="text-gray-700 text-xs">—</span>
+          <span className="text-app-t3/40 text-xs">—</span>
         )}
       </button>
       {anchorRect && (
@@ -282,19 +282,19 @@ function StatusCell({
             {value && (
               <button
                 onClick={() => { onChange(''); setAnchorRect(null); }}
-                className="w-full text-left px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-700 hover:text-gray-300"
+                className="w-full text-left px-3 py-1.5 text-xs text-app-t3 hover:bg-app-s3 hover:text-app-t2"
               >
                 Clear
               </button>
             )}
             {statusOptions.length === 0 && (
-              <p className="px-3 py-2 text-xs text-gray-600">No statuses yet</p>
+              <p className="px-3 py-2 text-xs text-app-t3/50">No statuses yet</p>
             )}
             {statusOptions.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => { onChange(opt.key); setAnchorRect(null); }}
-                className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-700"
+                className="w-full text-left px-3 py-1.5 text-xs hover:bg-app-s3"
               >
                 <span
                   className="inline-block text-white text-xs font-medium px-2 py-0.5 rounded w-full text-center"
@@ -351,17 +351,17 @@ function LinkCell({ col, value, onChange }: { col: Column; value: string; onChan
       <div
         ref={linkRef}
         onClick={() => col.sourceBoardId && setPickerRect(linkRef.current?.getBoundingClientRect() ?? null)}
-        className="px-2 py-1.5 text-xs cursor-pointer hover:bg-gray-700/50 flex items-center gap-1 min-h-[30px]"
+        className="px-2 py-1.5 text-xs cursor-pointer hover:bg-app-s3/50 flex items-center gap-1 min-h-[30px]"
       >
         {linkedTask ? (
           <>
-            <span className="text-blue-400 flex-shrink-0">↗</span>
-            <span className="text-gray-300 truncate">{linkedTask.name || '(unnamed)'}</span>
+            <span className="text-app-ac flex-shrink-0">↗</span>
+            <span className="text-app-t2 truncate">{linkedTask.name || '(unnamed)'}</span>
           </>
         ) : col.sourceBoardId ? (
-          <span className="text-gray-600">Link item…</span>
+          <span className="text-app-t3/50">Link item…</span>
         ) : (
-          <span className="text-gray-700">—</span>
+          <span className="text-app-t3/30">—</span>
         )}
       </div>
 
@@ -370,7 +370,7 @@ function LinkCell({ col, value, onChange }: { col: Column; value: string; onChan
         <div
           ref={notesRef}
           onClick={e => { e.stopPropagation(); setNotesRect(notesRef.current?.getBoundingClientRect() ?? null); }}
-          className="px-2 pb-1.5 text-[11px] text-gray-500 cursor-pointer hover:text-gray-300 border-t border-gray-700/40 transition-colors"
+          className="px-2 pb-1.5 text-[11px] text-app-t3 cursor-pointer hover:text-app-t2 border-t border-app-ln/40 transition-colors"
         >
           <span className="line-clamp-1">
             {importedRows.map(r => `${r.label}: ${r.value}`).join('  ·  ')}
@@ -383,35 +383,35 @@ function LinkCell({ col, value, onChange }: { col: Column; value: string; onChan
         <CellPopover anchorRect={pickerRect} onClose={() => setPickerRect(null)} width={256}>
           <div className="p-3">
             {!col.sourceBoardId ? (
-              <p className="text-xs text-gray-400 text-center py-2">
+              <p className="text-xs text-app-t3 text-center py-2">
                 Configure this column's source board via the settings icon in the column header.
               </p>
             ) : (
               <>
-                <p className="text-xs text-gray-500 mb-2">
-                  From: <span className="text-gray-300">{sourceBoard?.name ?? '…'}</span>
+                <p className="text-xs text-app-t3 mb-2">
+                  From: <span className="text-app-t2">{sourceBoard?.name ?? '…'}</span>
                 </p>
                 {value && (
                   <button
                     onClick={() => { onChange(''); setPickerRect(null); }}
-                    className="w-full text-left px-2 py-1 text-xs text-gray-500 hover:bg-gray-700 rounded mb-1"
+                    className="w-full text-left px-2 py-1 text-xs text-app-t3 hover:bg-app-s3 rounded mb-1"
                   >
                     Clear link
                   </button>
                 )}
                 <div className="max-h-48 overflow-y-auto space-y-0.5">
-                  {!sourceData && <p className="text-xs text-gray-600 py-2 text-center">Loading…</p>}
+                  {!sourceData && <p className="text-xs text-app-t3/50 py-2 text-center">Loading…</p>}
                   {sourceData?.tasks.map(task => (
                     <button
                       key={task.id}
                       onClick={() => { onChange(task.id); setPickerRect(null); }}
-                      className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-700 ${task.id === value ? 'bg-gray-700 text-white' : 'text-gray-300'}`}
+                      className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-app-s3 ${task.id === value ? 'bg-app-s3 text-app-t1' : 'text-app-t2'}`}
                     >
                       {task.name || '(unnamed)'}
                     </button>
                   ))}
                   {sourceData?.tasks.length === 0 && (
-                    <p className="text-xs text-gray-600 py-2 text-center">No tasks in source board</p>
+                    <p className="text-xs text-app-t3/50 py-2 text-center">No tasks in source board</p>
                   )}
                 </div>
               </>
@@ -424,13 +424,13 @@ function LinkCell({ col, value, onChange }: { col: Column; value: string; onChan
       {notesRect && (
         <CellPopover anchorRect={notesRect} onClose={() => setNotesRect(null)} width={280}>
           <div className="p-3 space-y-2">
-            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <p className="text-[10px] font-semibold text-app-t3 uppercase tracking-wider mb-2">
               From: {linkedTask.name || '(unnamed)'}
             </p>
             {importedRows.map((row, i) => (
               <div key={i}>
-                <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-0.5">{row.label}</p>
-                <p className="text-xs text-gray-200 whitespace-pre-wrap">{row.value}</p>
+                <p className="text-[10px] text-app-t3/60 uppercase tracking-wider mb-0.5">{row.label}</p>
+                <p className="text-xs text-app-t1 whitespace-pre-wrap">{row.value}</p>
               </div>
             ))}
           </div>
@@ -525,17 +525,17 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
       <div
         ref={triggerRef}
         onClick={open}
-        className="px-2 py-1.5 text-xs text-gray-300 truncate cursor-pointer hover:bg-gray-700/50 rounded min-h-[30px] flex items-center gap-1.5"
+        className="px-2 py-1.5 text-xs text-app-t2 truncate cursor-pointer hover:bg-app-s3/50 rounded min-h-[30px] flex items-center gap-1.5"
       >
         {value ? (
           <>
-            <span className="text-emerald-400 flex-shrink-0">
+            <span className="text-app-ac flex-shrink-0">
               <svg width="10" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             </span>
             <span className="truncate">{value}</span>
           </>
         ) : (
-          <span className="text-gray-600">Set location…</span>
+          <span className="text-app-t3/50">Set location…</span>
         )}
       </div>
       {anchorRect && (
@@ -546,7 +546,7 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
               onChange={e => handleInput(e.target.value)}
               autoFocus
               placeholder={MAPS_API_KEY ? 'Search for an address…' : 'Enter an address…'}
-              className="w-full bg-transparent text-sm text-white outline-none placeholder-gray-600 px-1 py-1"
+              className="w-full bg-transparent text-sm text-app-t1 outline-none placeholder-app-t3/50 px-1 py-1"
               onKeyDown={e => {
                 if (e.key === 'Escape') setAnchorRect(null);
                 if (e.key === 'Enter') {
@@ -556,15 +556,15 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
               }}
             />
             {suggestions.length > 0 && (
-              <div className="mt-1 border-t border-gray-700/60 pt-1">
+              <div className="mt-1 border-t border-app-ln/60 pt-1">
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
                     onMouseDown={e => e.preventDefault()}
                     onClick={() => selectSuggestion(s)}
-                    className="w-full text-left px-2 py-1.5 text-xs text-gray-300 hover:bg-gray-700 rounded flex items-center gap-2"
+                    className="w-full text-left px-2 py-1.5 text-xs text-app-t2 hover:bg-app-s3 rounded flex items-center gap-2"
                   >
-                    <span className="text-gray-500 flex-shrink-0">
+                    <span className="text-app-t3 flex-shrink-0">
                       <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                     </span>
                     <span className="truncate">{s.placePrediction.text.text}</span>
@@ -573,12 +573,12 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
               </div>
             )}
             {value && suggestions.length === 0 && (
-              <div className="mt-1 border-t border-gray-700/60 pt-1 space-y-0.5">
+              <div className="mt-1 border-t border-app-ln/60 pt-1 space-y-0.5">
                 {onSetTaskName && (
                   <button
                     onMouseDown={e => e.preventDefault()}
                     onClick={() => { const street = value.split(',')[0].trim(); onSetTaskName(street); setAnchorRect(null); }}
-                    className="w-full text-left px-1 py-1 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded flex items-center gap-1.5"
+                    className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t1 hover:bg-app-s3 rounded flex items-center gap-1.5"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                     Use street as task title
@@ -587,7 +587,7 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
                 <button
                   onMouseDown={e => e.preventDefault()}
                   onClick={() => { onChange(''); setAnchorRect(null); }}
-                  className="w-full text-left px-1 py-1 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-700 rounded"
+                  className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t2 hover:bg-app-s3 rounded"
                 >
                   Clear location
                 </button>
@@ -649,9 +649,9 @@ function FormulaCell({ col, allColumns, rowFields }: {
 
   return (
     <div className={`px-2 py-1.5 text-xs min-h-[30px] flex items-center tabular-nums select-none ${
-      isEmpty ? 'text-gray-700' :
+      isEmpty ? 'text-app-t3/30' :
       isError ? 'text-amber-600/70 italic' :
-      'text-gray-200'
+      'text-app-t2'
     }`}>
       {isEmpty ? '—' : isError ? 'formula error' : result}
     </div>

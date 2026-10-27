@@ -81,22 +81,22 @@ export function ColumnPicker({ boardId, onCreated, onClose, anchorRect }: Column
     <>
       <div className="fixed inset-0 z-[100]" onMouseDown={onClose} />
       <div
-        className="fixed z-[101] bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-3 w-56"
+        className="fixed z-[101] bg-app-s2 border border-app-ln rounded-xl shadow-xl p-3 w-56"
         style={style}
       >
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Add column</p>
+        <p className="text-xs font-semibold text-app-t3 uppercase tracking-wider mb-2">Add column</p>
         <div className="space-y-0.5">
           {COLUMN_TYPES.map(({ type, label, icon, desc }) => (
             <button
               key={type}
               onClick={() => handleCreate(type)}
               disabled={creating}
-              className="w-full text-left flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+              className="w-full text-left flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-app-s3 transition-colors disabled:opacity-50"
             >
-              <span className="w-5 flex-shrink-0 flex items-center justify-center text-gray-400">{icon}</span>
+              <span className="w-5 flex-shrink-0 flex items-center justify-center text-app-t3">{icon}</span>
               <div className="min-w-0">
-                <p className="text-sm text-white font-medium leading-tight">{label}</p>
-                <p className="text-xs text-gray-500 leading-tight">{desc}</p>
+                <p className="text-sm text-app-t1 font-medium leading-tight">{label}</p>
+                <p className="text-xs text-app-t3 leading-tight">{desc}</p>
               </div>
             </button>
           ))}

@@ -106,11 +106,13 @@ export function ColumnHeader({ col, boardId, groupColor, isDragging, isDragTarge
       onDrop={onDrop}
       onDragEnd={onDragEnd}
       style={{ width: colWidth, minWidth: colWidth }}
-      className={`group/col relative px-2 py-2 text-left transition-colors select-none border-r border-gray-700/60 ${isDragging ? 'opacity-40' : isDragTarget ? 'bg-violet-900/20' : ''}`}
+      className={`group/col relative px-2 py-2 text-left transition-colors select-none border-r border-app-ln/60 ${isDragging ? 'opacity-40' : isDragTarget ? 'bg-app-ac/10' : ''}`}
     >
       {/* Label row — no action buttons in flow, so input gets full width */}
       <div className="flex items-center gap-0.5 overflow-hidden">
-        <span className="opacity-0 group-hover/col:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 select-none leading-none text-xs mr-0.5 flex-shrink-0">⠿</span>
+        <span className="opacity-0 group-hover/col:opacity-40 cursor-grab active:cursor-grabbing text-app-t3 select-none mr-0.5 flex-shrink-0 flex items-center">
+          <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/></svg>
+        </span>
         <ColLabelInput value={col.label} onSave={handleLabelSave} inputRef={labelInputRef} />
       </div>
 
@@ -123,7 +125,7 @@ export function ColumnHeader({ col, boardId, groupColor, isDragging, isDragTarge
               setConfigRect(configBtnRef.current?.getBoundingClientRect() ?? null);
               setShowConfig(s => !s);
             }}
-            className="w-4 h-4 text-gray-500 hover:text-gray-300 flex items-center justify-center"
+            className="w-4 h-4 text-app-t3 hover:text-app-t2 flex items-center justify-center"
             title="Configure column"
           >
             <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
@@ -133,10 +135,10 @@ export function ColumnHeader({ col, boardId, groupColor, isDragging, isDragTarge
         )}
         <button
           onClick={handleDelete}
-          className="w-4 h-4 text-gray-600 hover:text-red-400 text-sm leading-none flex items-center justify-center"
+          className="w-4 h-4 text-app-t3 hover:text-app-dg flex items-center justify-center"
           title="Delete column"
         >
-          ×
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
         </button>
       </div>
 
@@ -154,7 +156,7 @@ export function ColumnHeader({ col, boardId, groupColor, isDragging, isDragTarge
         <>
           <div className="fixed inset-0 z-[100]" onMouseDown={() => setShowConfig(false)} />
           <div
-            className="fixed z-[101] bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-3 w-72"
+            className="fixed z-[101] bg-app-s2 border border-app-ln rounded-xl shadow-xl p-3 w-72"
             style={{ top: configRect.bottom + 4, left: configRect.left }}
           >
             {col.type === 'dropdown' && (
@@ -209,7 +211,7 @@ function ColLabelInput({ value, onSave, inputRef }: {
         onSave(e.target.value);
       }}
       onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-      className="text-sm text-gray-400 font-medium bg-transparent outline-none min-w-0 flex-1 w-full"
+      className="text-sm text-app-t3 font-medium bg-transparent outline-none min-w-0 flex-1 w-full"
     />
   );
 }
@@ -223,7 +225,7 @@ function ColorPicker({ selected, onChange }: { selected?: string; onChange: (key
         <button
           key={key}
           onClick={() => onChange(key)}
-          className={`w-4 h-4 rounded-full transition-transform ${selected === key ? 'ring-2 ring-white ring-offset-1 ring-offset-gray-800 scale-110' : 'hover:scale-110'}`}
+          className={`w-4 h-4 rounded-full transition-transform ${selected === key ? 'ring-2 ring-app-t1 ring-offset-1 ring-offset-app-s2 scale-110' : 'hover:scale-110'}`}
           style={{ backgroundColor: hex }}
           title={key}
         />
@@ -283,7 +285,7 @@ function DropdownOptionEditor({
 
   return (
     <div>
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Dropdown options</p>
+      <p className="text-xs font-semibold text-app-t3 uppercase tracking-wider mb-3">Dropdown options</p>
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {options.map((opt, i) => (
           <div
@@ -299,26 +301,26 @@ function DropdownOptionEditor({
             onDrop={e => { e.preventDefault(); handleDrop(i); setDragOverIndex(null); }}
             onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); fromHandle.current = false; }}
             className={[
-              'flex items-start gap-2 bg-gray-900 rounded-lg p-2 transition-opacity',
+              'flex items-start gap-2 bg-app-s1 rounded-lg p-2 transition-opacity',
               dragIndex === i ? 'opacity-40' : '',
-              dragOverIndex === i && dragIndex !== i ? 'ring-2 ring-violet-500 ring-inset' : '',
+              dragOverIndex === i && dragIndex !== i ? 'ring-2 ring-app-ac ring-inset' : '',
             ].join(' ')}
           >
             {/* Drag handle */}
             <div
               onMouseDown={() => { fromHandle.current = true; }}
               onMouseUp={() => { fromHandle.current = false; }}
-              className="cursor-grab active:cursor-grabbing text-gray-600 hover:text-gray-400 select-none pt-0.5 flex-shrink-0 text-xs"
+              className="cursor-grab active:cursor-grabbing text-app-t3/50 hover:text-app-t3 select-none pt-1 flex-shrink-0 flex items-center"
               title="Drag to reorder"
             >
-              ⠿
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <input
                 defaultValue={opt.label}
                 onBlur={e => updateOption(i, { label: e.target.value })}
                 onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                className="text-xs text-white bg-transparent outline-none w-full border-b border-gray-700 pb-0.5 focus:border-gray-500"
+                className="text-xs text-app-t1 bg-transparent outline-none w-full border-b border-app-ln pb-0.5 focus:border-app-ac"
                 placeholder="Option label"
               />
               <ColorPicker
@@ -328,16 +330,16 @@ function DropdownOptionEditor({
             </div>
             <button
               onClick={() => removeOption(i)}
-              className="text-gray-600 hover:text-red-400 text-sm leading-none flex-shrink-0 mt-0.5"
+              className="text-app-t3 hover:text-app-dg flex items-center justify-center flex-shrink-0 mt-0.5"
             >
-              ×
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
             </button>
           </div>
         ))}
       </div>
       <button
         onClick={addOption}
-        className="mt-2 w-full text-xs text-gray-500 hover:text-gray-300 border border-dashed border-gray-700 hover:border-gray-500 rounded-lg py-1.5 transition-colors"
+        className="mt-2 w-full text-xs text-app-t3 hover:text-app-t2 border border-dashed border-app-ln hover:border-app-t3 rounded-lg py-1.5 transition-colors"
       >
         + Add option
       </button>
@@ -401,7 +403,7 @@ function StatusOptionEditor({
 
   return (
     <div>
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Status options</p>
+      <p className="text-xs font-semibold text-app-t3 uppercase tracking-wider mb-3">Status options</p>
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {options.map((opt, i) => (
           <div
@@ -417,26 +419,26 @@ function StatusOptionEditor({
             onDrop={e => { e.preventDefault(); handleDrop(i); setDragOverIndex(null); }}
             onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); fromHandle.current = false; }}
             className={[
-              'flex items-start gap-2 bg-gray-900 rounded-lg p-2 transition-opacity',
+              'flex items-start gap-2 bg-app-s1 rounded-lg p-2 transition-opacity',
               dragIndex === i ? 'opacity-40' : '',
-              dragOverIndex === i && dragIndex !== i ? 'ring-2 ring-violet-500 ring-inset' : '',
+              dragOverIndex === i && dragIndex !== i ? 'ring-2 ring-app-ac ring-inset' : '',
             ].join(' ')}
           >
             {/* Drag handle */}
             <div
               onMouseDown={() => { fromHandle.current = true; }}
               onMouseUp={() => { fromHandle.current = false; }}
-              className="cursor-grab active:cursor-grabbing text-gray-600 hover:text-gray-400 select-none pt-0.5 flex-shrink-0 text-xs"
+              className="cursor-grab active:cursor-grabbing text-app-t3/50 hover:text-app-t3 select-none pt-1 flex-shrink-0 flex items-center"
               title="Drag to reorder"
             >
-              ⠿
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <input
                 defaultValue={opt.label}
                 onBlur={e => updateOption(i, { label: e.target.value })}
                 onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                className="text-xs text-white bg-transparent outline-none w-full border-b border-gray-700 pb-0.5 focus:border-gray-500"
+                className="text-xs text-app-t1 bg-transparent outline-none w-full border-b border-app-ln pb-0.5 focus:border-app-ac"
                 placeholder="Status label"
               />
               <ColorPicker
@@ -446,16 +448,16 @@ function StatusOptionEditor({
             </div>
             <button
               onClick={() => removeOption(i)}
-              className="text-gray-600 hover:text-red-400 text-sm leading-none flex-shrink-0 mt-0.5"
+              className="text-app-t3 hover:text-app-dg flex items-center justify-center flex-shrink-0 mt-0.5"
             >
-              ×
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
             </button>
           </div>
         ))}
       </div>
       <button
         onClick={addOption}
-        className="mt-2 w-full text-xs text-gray-500 hover:text-gray-300 border border-dashed border-gray-700 hover:border-gray-500 rounded-lg py-1.5 transition-colors"
+        className="mt-2 w-full text-xs text-app-t3 hover:text-app-t2 border border-dashed border-app-ln hover:border-app-t3 rounded-lg py-1.5 transition-colors"
       >
         + Add status
       </button>
@@ -500,15 +502,15 @@ function LinkConfigPanel({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Link configuration</p>
+      <p className="text-xs font-semibold text-app-t3 uppercase tracking-wider">Link configuration</p>
 
       {/* Source board */}
       <div>
-        <label className="block text-xs text-gray-500 mb-1">Source board</label>
+        <label className="block text-xs text-app-t3 mb-1">Source board</label>
         <select
           value={sourceBoardId}
           onChange={e => { setSourceBoardId(e.target.value); setImportCols([]); }}
-          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-2 py-1.5 text-sm text-white outline-none"
+          className="w-full bg-app-s1 border border-app-ln rounded-lg px-2 py-1.5 text-sm text-app-t1 outline-none focus:border-app-ac"
         >
           <option value="">— none —</option>
           {boards?.filter(b => b.id !== boardId).map(b => (
@@ -520,12 +522,12 @@ function LinkConfigPanel({
       {/* Import columns */}
       {sourceBoardId && (
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Copy these columns</label>
-          {loadingCols && <p className="text-xs text-gray-600">Loading…</p>}
+          <label className="block text-xs text-app-t3 mb-1.5">Copy these columns</label>
+          {loadingCols && <p className="text-xs text-app-t3/60">Loading…</p>}
           {!loadingCols && sourceBoardData && (
             <div className="space-y-1 max-h-40 overflow-y-auto">
               {sourceBoardData.columns.length === 0 && (
-                <p className="text-xs text-gray-600">No columns on this board</p>
+                <p className="text-xs text-app-t3/60">No columns on this board</p>
               )}
               {sourceBoardData.columns.map(c => (
                 <label key={c.id} className="flex items-center gap-2 cursor-pointer group">
@@ -533,9 +535,9 @@ function LinkConfigPanel({
                     type="checkbox"
                     checked={importCols.includes(c.id)}
                     onChange={e => toggleImportCol(c.id, e.target.checked)}
-                    className="accent-violet-500 w-3 h-3 flex-shrink-0"
+                    className="accent-app-ac w-3 h-3 flex-shrink-0"
                   />
-                  <span className="text-xs text-gray-300 group-hover:text-white transition-colors truncate">
+                  <span className="text-xs text-app-t2 group-hover:text-app-t1 transition-colors truncate">
                     {c.label}
                   </span>
                 </label>
@@ -547,7 +549,7 @@ function LinkConfigPanel({
 
       <button
         onClick={handleSave}
-        className="w-full bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium py-1.5 rounded-lg transition-colors"
+        className="w-full bg-app-ac hover:bg-app-ac/90 text-app-ac-tx text-xs font-medium py-1.5 rounded-lg transition-colors"
       >
         Save
       </button>
@@ -575,31 +577,31 @@ function FormulaConfigPanel({ col, boardId, onClose }: { col: Column; boardId: s
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Formula</p>
+      <p className="text-xs font-semibold text-app-t3 uppercase tracking-wider">Formula</p>
 
       {/* Expression input */}
       <div>
-        <label className="block text-xs text-gray-500 mb-1">Expression</label>
+        <label className="block text-xs text-app-t3 mb-1">Expression</label>
         <input
           autoFocus
           value={formula}
           onChange={e => setFormula(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleSave(); }}
           placeholder={`"Notes" / 3`}
-          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-2 py-1.5 text-sm text-white font-mono outline-none placeholder-gray-600 focus:border-violet-500 transition-colors"
+          className="w-full bg-app-s1 border border-app-ln rounded-lg px-2 py-1.5 text-sm text-app-t1 font-mono outline-none placeholder-app-t3/40 focus:border-app-ac transition-colors"
         />
       </div>
 
       {/* Clickable column chips — clicking inserts the reference at cursor */}
       {refCols.length > 0 && (
         <div>
-          <p className="text-xs text-gray-500 mb-1.5">Insert column reference:</p>
+          <p className="text-xs text-app-t3 mb-1.5">Insert column reference:</p>
           <div className="flex flex-wrap gap-1">
             {refCols.map(c => (
               <button
                 key={c.id}
                 onClick={() => setFormula(f => f + `"${c.label}"`)}
-                className="text-[10px] font-mono bg-gray-900 border border-gray-700 rounded px-1.5 py-0.5 text-gray-300 hover:border-violet-500 hover:text-violet-300 transition-colors"
+                className="text-[10px] font-mono bg-app-s1 border border-app-ln rounded px-1.5 py-0.5 text-app-t2 hover:border-app-ac hover:text-app-ac transition-colors"
               >
                 "{c.label}"
               </button>
@@ -609,14 +611,14 @@ function FormulaConfigPanel({ col, boardId, onClose }: { col: Column; boardId: s
       )}
 
       {/* Syntax hint */}
-      <p className="text-[10px] text-gray-600 leading-relaxed">
-        Wrap column names in quotes: <span className="font-mono text-gray-500">"Notes"</span>.{' '}
-        Supports <span className="font-mono text-gray-500">+ − * / ( )</span>
+      <p className="text-[10px] text-app-t3/60 leading-relaxed">
+        Wrap column names in quotes: <span className="font-mono text-app-t3">"Notes"</span>.{' '}
+        Supports <span className="font-mono text-app-t3">+ − * / ( )</span>
       </p>
 
       <button
         onClick={handleSave}
-        className="w-full bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium py-1.5 rounded-lg transition-colors"
+        className="w-full bg-app-ac hover:bg-app-ac/90 text-app-ac-tx text-xs font-medium py-1.5 rounded-lg transition-colors"
       >
         Save
       </button>
