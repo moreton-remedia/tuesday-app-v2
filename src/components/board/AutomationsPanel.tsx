@@ -135,7 +135,7 @@ function AutomationEditorModal({
     <>
       <div className="fixed inset-0 z-[300] bg-black/50" onMouseDown={onCancel} />
       <div className="fixed inset-0 z-[301] flex items-center justify-center pointer-events-none">
-        <div className="w-full max-w-md mx-4 pointer-events-auto max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+        <div className="w-full max-w-md mx-4 pointer-events-auto max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl bg-app-s1">
           <AutomationEditor
             automation={editing === 'new' ? null : editing}
             boardId={boardId}
