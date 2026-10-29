@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext, createContext } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { orpcClient, orpcUtils } from '@/rpc/react';
@@ -189,6 +189,11 @@ function AutomationEditorModal({
 
 // ── Inline token helpers ──────────────────────────────────────────────────────
 
+const OpenTokenContext = createContext<{ openId: string | null; setOpenId: (id: string | null) => void }>({
+  openId: null,
+  setOpenId: () => {},
+});
+
 /** A custom inline dropdown that matches the app's dark theme. */
 function Token({
   value, onChange, options, variant = 'default', placeholder = '…', disabled = false,
@@ -200,7 +205,9 @@ function Token({
   placeholder?: string;
   disabled?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const { openId, setOpenId } = useContext(OpenTokenContext);
+  const tokenId = useRef(Math.random().toString(36).slice(2));
+  const open = openId === tokenId.current;
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [search, setSearch] = useState('');
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -223,11 +230,11 @@ function Token({
     if (disabled) return;
     setRect(btnRef.current?.getBoundingClientRect() ?? null);
     setSearch('');
-    setOpen(s => !s);
+    setOpenId(open ? null : tokenId.current);
   }
 
   function handleClose() {
-    setOpen(false);
+    setOpenId(null);
     setSearch('');
   }
 
@@ -571,6 +578,7 @@ function AutomationEditor({
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [openTokenId, setOpenTokenId] = useState<string | null>(null);
 
   function updateCondition(idx: number, patch: Partial<ConditionDraft>) {
     setConditions(prev => prev.map((c, i) => i === idx ? { ...c, ...patch } : c));
@@ -672,6 +680,7 @@ function AutomationEditor({
   }
 
   return (
+    <OpenTokenContext.Provider value={{ openId: openTokenId, setOpenId: setOpenTokenId }}>
     <div className="rounded-xl border border-app-ac/30 overflow-hidden">
       {/* ── Title ── */}
       <div className="px-4 pt-3.5 pb-2.5 border-b border-app-ln/60 bg-app-s2/80">
@@ -779,6 +788,7 @@ function AutomationEditor({
         </button>
       </div>
     </div>
+    </OpenTokenContext.Provider>
   );
 }
 
