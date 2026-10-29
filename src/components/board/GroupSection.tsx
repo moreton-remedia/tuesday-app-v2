@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { orpcClient, orpcUtils } from '@/rpc/react';
 import { CellRenderer } from '@/components/columns/cells';
 import { ColumnHeader } from '@/components/columns/ColumnHeader';
@@ -463,8 +464,19 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
         const dup = allBoardTasks.find(t => t.id !== task.id && (t.name ?? '').trim().toLowerCase() === trimmed.toLowerCase());
         if (dup) { setDuplicateOf(dup); return; }
       }
-      await orpcClient.task.updateTask({ taskId: task.id, name });
-      invalidate();
+      const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
+      const prev = qc.getQueryData(queryKey);
+      qc.setQueryData(queryKey, (old: any) =>
+        old ? { ...old, tasks: old.tasks.map((t: Task) => t.id === task.id ? { ...t, name } : t) } : old
+      );
+      try {
+        await orpcClient.task.updateTask({ taskId: task.id, name });
+        invalidate();
+      } catch {
+        qc.setQueryData(queryKey, prev);
+        if (inputRef.current) inputRef.current.value = task.name ?? '';
+        toast.error('Failed to save task name. Please try again.');
+      }
     }, 500);
   }
 
@@ -485,15 +497,36 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
 
   async function handleFieldChange(colId: string, value: string) {
     const newFields = { ...task.fields, [colId]: value };
-    await orpcClient.task.updateTaskFields({ taskId: task.id, fields: newFields });
-    invalidate();
+    const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
+    const prev = qc.getQueryData(queryKey);
+    qc.setQueryData(queryKey, (old: any) =>
+      old ? { ...old, tasks: old.tasks.map((t: Task) => t.id === task.id ? { ...t, fields: newFields } : t) } : old
+    );
+    try {
+      await orpcClient.task.updateTaskFields({ taskId: task.id, fields: newFields });
+      invalidate();
+    } catch {
+      qc.setQueryData(queryKey, prev);
+      toast.error('Failed to save changes. Please try again.');
+    }
   }
 
   async function handleSetAsTitle(name: string) {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     if (inputRef.current) inputRef.current.value = name;
-    await orpcClient.task.updateTask({ taskId: task.id, name });
-    invalidate();
+    const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
+    const prev = qc.getQueryData(queryKey);
+    qc.setQueryData(queryKey, (old: any) =>
+      old ? { ...old, tasks: old.tasks.map((t: Task) => t.id === task.id ? { ...t, name } : t) } : old
+    );
+    try {
+      await orpcClient.task.updateTask({ taskId: task.id, name });
+      invalidate();
+    } catch {
+      qc.setQueryData(queryKey, prev);
+      if (inputRef.current) inputRef.current.value = task.name ?? '';
+      toast.error('Failed to set task name. Please try again.');
+    }
   }
 
   async function handleDelete() {
