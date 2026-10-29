@@ -75,13 +75,13 @@ export const updateTask = workspaceScoped
     const [task] = await database.update(taskTable).set(patch).where(eq(taskTable.id, input.taskId)).returning();
     if (!task) throw new ORPCError('NOT_FOUND', { message: 'Task not found.' });
 
-    // When fields change, run automation checks so triggers fire (e.g. text-contains on notes).
-    // Use the task's full saved fields (not just the partial input) so evaluateTrigger
-    // sees the complete field state, including any columns not touched by this call.
+    // When fields change, await automations so their side-effects are committed before
+    // the server responds (same reasoning as updateTaskFields above).
     if (input.fields !== undefined) {
-      runTaskAutomations(task.id, task.groupId, (task.fields as Record<string, string>) ?? {}).catch(() => {});
-      // Re-evaluate link-changes automations on any task that links to THIS task
-      runAutomationsForLinksToTask(task.id).catch(() => {});
+      await Promise.all([
+        runTaskAutomations(task.id, task.groupId, (task.fields as Record<string, string>) ?? {}).catch(() => {}),
+        runAutomationsForLinksToTask(task.id).catch(() => {}),
+      ]);
     }
 
     const newBoardId = await boardIdFromGroup(task.groupId);
@@ -98,10 +98,13 @@ export const updateTaskFields = workspaceScoped
       .where(eq(taskTable.id, input.taskId))
       .returning();
     if (!task) throw new ORPCError('NOT_FOUND', { message: 'Task not found.' });
-    runTaskAutomations(task.id, task.groupId, input.fields).catch(() => {});
-    // Re-evaluate link-changes automations on any task that links to THIS task
-    // (so automations fire when the linked task's fields change, not only when the link is set)
-    runAutomationsForLinksToTask(task.id).catch(() => {});
+    // Await automations so their side-effects (e.g. a set-status action) are committed
+    // before the server responds — the client's invalidation then fetches the fully
+    // resolved state in one round trip instead of racing the fire-and-forget.
+    await Promise.all([
+      runTaskAutomations(task.id, task.groupId, input.fields).catch(() => {}),
+      runAutomationsForLinksToTask(task.id).catch(() => {}),
+    ]);
     boardIdFromGroup(task.groupId).then(id => id && broadcastBoardUpdate(id)).catch(() => {});
     return task;
   });
@@ -171,12 +174,12 @@ export const updateSubitem = workspaceScoped
     const [sub] = await database.update(subitemTable).set(patch).where(eq(subitemTable.id, input.subitemId)).returning();
     if (!sub) throw new ORPCError('NOT_FOUND', { message: 'Subitem not found.' });
 
-    // Trigger automations when subitem fields change (e.g. status change → create another subitem)
+    // Await automations when subitem fields change so side-effects are committed before responding.
     if (input.fields !== undefined) {
       const [parentTask] = await database.select({ groupId: taskTable.groupId })
         .from(taskTable).where(eq(taskTable.id, sub.taskId));
       if (parentTask) {
-        runTaskAutomations(sub.taskId, parentTask.groupId, input.fields).catch(() => {});
+        await runTaskAutomations(sub.taskId, parentTask.groupId, input.fields).catch(() => {});
       }
     }
 
