@@ -459,7 +459,7 @@ async function executeAction(
       if (!action.groupId) break;
       if (groupId === action.groupId) break; // already in the target group — skip
       await database.update(taskTable)
-        .set({ groupId: action.groupId, updatedAt: new Date() })
+        .set({ groupId: action.groupId, expanded: 0, updatedAt: new Date() })
         .where(eq(taskTable.id, taskId));
       break;
     }
