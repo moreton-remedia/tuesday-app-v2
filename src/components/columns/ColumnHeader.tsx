@@ -211,7 +211,7 @@ function ColLabelInput({ value, onSave, inputRef }: {
         onSave(e.target.value);
       }}
       onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-      className="text-sm text-app-t3 font-medium bg-transparent outline-none min-w-0 flex-1 w-full"
+      className="text-sm text-app-t2 font-medium bg-transparent outline-none min-w-0 flex-1 w-full appearance-none [-webkit-text-fill-color:inherit] focus:text-app-t1 [&:focus]:[-webkit-text-fill-color:inherit]"
     />
   );
 }

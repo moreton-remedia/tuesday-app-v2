@@ -41,12 +41,13 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
   async function handleDuplicate(auto: Automation) {
     const trigger = auto.trigger as AutomationTrigger;
     const name = trigger.automationName ? `Copy of ${trigger.automationName}` : undefined;
-    await orpcClient.automation.createAutomation({
+    const created = await orpcClient.automation.createAutomation({
       boardId,
       trigger: { ...trigger, automationName: name },
       actions: auto.actions as AutomationAction[],
     });
     invalidate();
+    setEditing(created as Automation);
   }
 
   const triggerCols = columns.filter(c => c.type === 'status' || c.type === 'dropdown' || c.type === 'notes' || c.type === 'link');
@@ -69,12 +70,12 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 overscroll-contain">
           {automations.length === 0 && (
             <p className="text-sm text-app-t3 text-center py-8">No automations yet. Add one to get started.</p>
           )}
 
-          {automations.map(auto => (
+          {[...automations].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).map(auto => (
             <AutomationCard
               key={auto.id}
               auto={auto}

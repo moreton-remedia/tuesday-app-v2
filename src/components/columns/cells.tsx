@@ -174,6 +174,63 @@ function DropdownCell({
   );
 }
 
+// ── TimeInput ─────────────────────────────────────────────────────────────────
+
+const QUARTER_HOURS = Array.from({ length: 96 }, (_, i) => {
+  const h = String(Math.floor(i / 4)).padStart(2, '0');
+  const m = String((i % 4) * 15).padStart(2, '0');
+  return `${h}:${m}`;
+});
+
+function TimeInput({ value, onChange, onKeyDown }: {
+  value: string;
+  onChange: (v: string) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Scroll the selected option into view when the dropdown opens
+  useEffect(() => {
+    if (!open || !listRef.current) return;
+    const active = listRef.current.querySelector('[data-active="true"]') as HTMLElement | null;
+    active?.scrollIntoView({ block: 'nearest' });
+  }, [open]);
+
+  return (
+    <div className="relative flex-shrink-0 w-20">
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={onKeyDown}
+        placeholder="--:--"
+        className="bg-app-s2 text-xs text-app-t1 border border-app-ln rounded px-1 py-0.5 outline-none w-full"
+      />
+      {open && (
+        <div
+          ref={listRef}
+          className="absolute top-full left-0 z-50 mt-0.5 min-w-full bg-app-s1 border border-app-ln rounded shadow-lg max-h-40 overflow-y-auto"
+        >
+          {QUARTER_HOURS.map(t => (
+            <button
+              key={t}
+              tabIndex={-1}
+              data-active={t === value}
+              onMouseDown={e => { e.preventDefault(); onChange(t); setOpen(false); }}
+              className={`w-full text-left px-2 py-0.5 text-xs transition-colors hover:bg-app-s2 ${t === value ? 'text-app-ac font-medium' : 'text-app-t2'}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── DateCell ──────────────────────────────────────────────────────────────────
 
 function DateCell({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -209,23 +266,22 @@ function DateCell({ value, onChange }: { value: string; onChange: (v: string) =>
 
   if (editing) {
     return (
-      <div className="flex items-center gap-1 px-1 py-0.5">
+      <div
+        className="flex items-center gap-1 px-1 py-0.5"
+        onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) commitEdit(); }}
+      >
         <input
           type="date"
           value={editDate}
           onChange={e => setEditDate(e.target.value)}
-          onBlur={commitEdit}
           onKeyDown={e => { if (e.key === 'Escape') setEditing(false); if (e.key === 'Enter') commitEdit(); }}
           autoFocus
           className="bg-app-s2 text-xs text-app-t1 border border-app-ln rounded px-1 py-0.5 outline-none flex-1 min-w-0"
         />
-        <input
-          type="time"
+        <TimeInput
           value={editTime}
-          onChange={e => setEditTime(e.target.value)}
-          onBlur={commitEdit}
+          onChange={setEditTime}
           onKeyDown={e => { if (e.key === 'Escape') setEditing(false); if (e.key === 'Enter') commitEdit(); }}
-          className="bg-app-s2 text-xs text-app-t1 border border-app-ln rounded px-1 py-0.5 outline-none w-20 flex-shrink-0"
         />
       </div>
     );
