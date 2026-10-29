@@ -22,14 +22,21 @@ interface AutomationsPanelProps {
 export function AutomationsPanel({ boardId, automations, columns, groups, allBoards, onClose }: AutomationsPanelProps) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Automation | 'new' | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   function invalidate() {
     qc.invalidateQueries(orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }));
   }
 
   async function handleDelete(autoId: string) {
-    if (!confirm('Delete this automation?')) return;
-    await orpcClient.automation.deleteAutomation({ automationId: autoId });
+    setConfirmDeleteId(autoId);
+  }
+
+  async function confirmDelete() {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
+    await orpcClient.automation.deleteAutomation({ automationId: id });
     invalidate();
   }
 
@@ -113,6 +120,32 @@ export function AutomationsPanel({ boardId, automations, columns, groups, allBoa
         onSave={() => { setEditing(null); invalidate(); }}
         onCancel={() => setEditing(null)}
       />
+      {confirmDeleteId && createPortal(
+        <div
+          className="fixed inset-0 z-[400] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onMouseDown={e => { if (e.target === e.currentTarget) setConfirmDeleteId(null); }}
+        >
+          <div className="w-full max-w-xs bg-app-s1 border border-app-ln rounded-2xl shadow-2xl mx-4 p-5">
+            <h3 className="text-sm font-semibold text-app-t1 mb-1">Delete automation</h3>
+            <p className="text-xs text-app-t2 mb-4">This automation will be permanently deleted. This can't be undone.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="flex-1 px-3 py-2 text-xs font-medium text-app-t1 bg-app-s3 hover:bg-app-ln rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 px-3 py-2 text-xs font-medium text-white bg-app-dg hover:opacity-90 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 }
