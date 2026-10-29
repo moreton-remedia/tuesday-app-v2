@@ -43,7 +43,7 @@ interface CellProps {
   allColumns?: Column[];
   /** All field values for the current row — required for formula cells. */
   rowFields?: Record<string, string>;
-  /** Location cells only: called when user wants to set the street address as the task title. */
+  /** Location cells only: called when user wants to set the address as the task title. */
   onSetTaskName?: (name: string) => void;
 }
 
@@ -628,25 +628,34 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
                 ))}
               </div>
             )}
-            {value && suggestions.length === 0 && (
+            {(draft.trim() || value) && (
               <div className="mt-1 border-t border-app-ln/60 pt-1 space-y-0.5">
                 {onSetTaskName && (
                   <button
                     onMouseDown={e => e.preventDefault()}
-                    onClick={() => { const street = value.split(',')[0].trim(); onSetTaskName(street); setAnchorRect(null); }}
+                    onClick={() => {
+                      const addr = draft.trim() || value;
+                      if (addr !== value) onChange(addr);
+                      onSetTaskName(addr.split(',')[0].trim());
+                      setAnchorRect(null);
+                      setSuggestions([]);
+                      sessionTokenRef.current = null;
+                    }}
                     className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t1 hover:bg-app-s3 rounded flex items-center gap-1.5"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                     Use street as task title
                   </button>
                 )}
-                <button
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => { onChange(''); setAnchorRect(null); }}
-                  className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t2 hover:bg-app-s3 rounded"
-                >
-                  Clear location
-                </button>
+                {value && (
+                  <button
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => { onChange(''); setAnchorRect(null); }}
+                    className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t2 hover:bg-app-s3 rounded"
+                  >
+                    Clear location
+                  </button>
+                )}
               </div>
             )}
           </div>
