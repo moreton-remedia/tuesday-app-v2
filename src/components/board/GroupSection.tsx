@@ -437,6 +437,7 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
 }: TaskRowProps) {
   const qc = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
+  const trRef = useRef<HTMLTableRowElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isExpanded = task.expanded === 1;
   const { toggleTask, isTaskSelected, selectedTaskIds } = useSelectionStore();
@@ -562,12 +563,12 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
   return (
     <>
       <tr
-        draggable
+        ref={trRef}
         onDragStart={onDragStart}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        onDragEnd={onDragEnd}
+        onDragEnd={e => { if (trRef.current) trRef.current.draggable = false; onDragEnd?.(); }}
         className={`group/row border-b border-app-ln-s transition-colors ${
           isDragging ? 'opacity-40' :
           isDragTarget ? 'bg-app-ac-lt' :
@@ -577,7 +578,11 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
       >
         {/* Grip handle + selection checkbox */}
         <td className="px-3 py-2 w-10 relative">
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/row:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 select-none leading-none text-xs pointer-events-none">⠿</span>
+          <span
+            onMouseDown={() => { if (trRef.current) trRef.current.draggable = true; }}
+            onMouseUp={() => { if (trRef.current) trRef.current.draggable = false; }}
+            className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/row:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 select-none leading-none text-xs"
+          >⠿</span>
           <button
             onClick={() => toggleTask(task.id, boardId)}
             className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${

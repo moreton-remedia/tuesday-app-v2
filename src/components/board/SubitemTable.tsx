@@ -267,6 +267,7 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
 }: SubitemRowProps) {
   const qc = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
+  const trRef = useRef<HTMLTableRowElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { toggleSubitem, isSubitemSelected, selectedSubitemIds } = useSelectionStore();
   const selected = isSubitemSelected(subitem.id);
@@ -332,12 +333,12 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
 
   return (
     <tr
-      draggable
+      ref={trRef}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      onDragEnd={onDragEnd}
+      onDragEnd={e => { if (trRef.current) trRef.current.draggable = false; onDragEnd?.(); }}
       className={`group/subrow border-b border-app-ln/30 transition-colors ${
         isDragging ? 'opacity-40' :
         isDragTarget ? 'bg-app-ac/10' :
@@ -347,7 +348,11 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
     >
       {/* Grip handle + selection checkbox */}
       <td className="px-3 py-1.5 w-10 relative">
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/subrow:opacity-40 cursor-grab active:cursor-grabbing text-app-t3 select-none pointer-events-none flex items-center">
+        <span
+          onMouseDown={() => { if (trRef.current) trRef.current.draggable = true; }}
+          onMouseUp={() => { if (trRef.current) trRef.current.draggable = false; }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/subrow:opacity-40 cursor-grab active:cursor-grabbing text-app-t3 select-none flex items-center"
+        >
           <svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/></svg>
         </span>
         <button
