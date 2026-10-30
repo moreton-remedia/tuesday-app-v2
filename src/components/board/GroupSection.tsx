@@ -433,7 +433,7 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
   const inputRef = useRef<HTMLInputElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isExpanded = task.expanded === 1;
-  const { toggleTask, isTaskSelected } = useSelectionStore();
+  const { toggleTask, isTaskSelected, selectedTaskIds } = useSelectionStore();
   const selected = isTaskSelected(task.id);
   const [duplicateOf, setDuplicateOf] = useState<Task | null>(null);
   const pendingNameRef = useRef<string | null>(null);
@@ -496,14 +496,30 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
   }
 
   async function handleFieldChange(colId: string, value: string) {
-    const newFields = { ...task.fields, [colId]: value };
     const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
-    const prev = qc.getQueryData(queryKey);
-    qc.setQueryData(queryKey, (old: any) =>
-      old ? { ...old, tasks: old.tasks.map((t: Task) => t.id === task.id ? { ...t, fields: newFields } : t) } : old
-    );
+    const prev = qc.getQueryData(queryKey) as any;
+
+    // When the task is selected alongside others, apply the change to all selected tasks
+    const idsToUpdate = selected && selectedTaskIds.size > 1
+      ? [...selectedTaskIds]
+      : [task.id];
+
+    // Build updated fields for each task from cached data
+    const updates = idsToUpdate.map(id => {
+      const existing = (prev?.tasks as Task[] | undefined)?.find(t => t.id === id);
+      const currentFields = ((existing?.fields ?? (id === task.id ? task.fields : {})) as Record<string, string>) ?? {};
+      return { taskId: id, fields: { ...currentFields, [colId]: value } };
+    });
+
+    // Optimistic patch all affected tasks
+    qc.setQueryData(queryKey, (old: any) => {
+      if (!old) return old;
+      const patchById = new Map(updates.map(u => [u.taskId, u.fields]));
+      return { ...old, tasks: old.tasks.map((t: Task) => patchById.has(t.id) ? { ...t, fields: patchById.get(t.id) } : t) };
+    });
+
     try {
-      await orpcClient.task.updateTaskFields({ taskId: task.id, fields: newFields });
+      await Promise.all(updates.map(u => orpcClient.task.updateTaskFields(u)));
       invalidate();
     } catch {
       qc.setQueryData(queryKey, prev);

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { orpcClient, orpcUtils } from '@/rpc/react';
 import { CellRenderer } from '@/components/columns/cells';
@@ -261,7 +262,7 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
   const qc = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { toggleSubitem, isSubitemSelected } = useSelectionStore();
+  const { toggleSubitem, isSubitemSelected, selectedSubitemIds } = useSelectionStore();
   const selected = isSubitemSelected(subitem.id);
 
   function invalidate() {
@@ -285,9 +286,36 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
   }
 
   async function handleFieldChange(colId: string, value: string) {
-    const newFields = { ...subitem.fields, [colId]: value };
-    await orpcClient.task.updateSubitem({ subitemId: subitem.id, fields: newFields });
-    invalidate();
+    const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
+    const prev = qc.getQueryData(queryKey) as any;
+
+    // When the subitem is selected alongside others, apply the change to all selected subitems
+    type Subitem = typeof subitem;
+    const idsToUpdate = selected && selectedSubitemIds.size > 1
+      ? [...selectedSubitemIds]
+      : [subitem.id];
+
+    // Build updated fields for each subitem from cached data
+    const updates = idsToUpdate.map(id => {
+      const existing = (prev?.subitems as Subitem[] | undefined)?.find(s => s.id === id);
+      const currentFields = ((existing?.fields ?? (id === subitem.id ? subitem.fields : {})) as Record<string, string>) ?? {};
+      return { subitemId: id, fields: { ...currentFields, [colId]: value } };
+    });
+
+    // Optimistic patch all affected subitems
+    qc.setQueryData(queryKey, (old: any) => {
+      if (!old) return old;
+      const patchById = new Map(updates.map(u => [u.subitemId, u.fields]));
+      return { ...old, subitems: old.subitems.map((s: Subitem) => patchById.has(s.id) ? { ...s, fields: patchById.get(s.id) } : s) };
+    });
+
+    try {
+      await Promise.all(updates.map(u => orpcClient.task.updateSubitem(u)));
+      invalidate();
+    } catch {
+      qc.setQueryData(queryKey, prev);
+      toast.error('Failed to save changes. Please try again.');
+    }
   }
 
   async function handleDelete() {
