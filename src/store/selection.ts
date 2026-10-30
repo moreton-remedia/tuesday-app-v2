@@ -9,6 +9,7 @@ interface SelectionState {
   selectAllTasks: (taskIds: string[], boardId: string) => void;
   selectAllSubitems: (subitemIds: string[], boardId: string) => void;
   clearSelection: () => void;
+  deselectItems: (taskIds: string[], subitemIds: string[]) => void;
   isTaskSelected: (taskId: string) => boolean;
   isSubitemSelected: (subitemId: string) => boolean;
 }
@@ -59,6 +60,16 @@ export const useSelectionStore = create<SelectionState>((set, get) => ({
   },
 
   clearSelection: () => set({ selectedTaskIds: new Set(), selectedSubitemIds: new Set(), boardId: null }),
+
+  deselectItems: (taskIds, subitemIds) => {
+    set(state => {
+      const nextTaskIds = new Set(state.selectedTaskIds);
+      const nextSubitemIds = new Set(state.selectedSubitemIds);
+      taskIds.forEach(id => nextTaskIds.delete(id));
+      subitemIds.forEach(id => nextSubitemIds.delete(id));
+      return { selectedTaskIds: nextTaskIds, selectedSubitemIds: nextSubitemIds };
+    });
+  },
 
   isTaskSelected: (taskId) => get().selectedTaskIds.has(taskId),
   isSubitemSelected: (subitemId) => get().selectedSubitemIds.has(subitemId),

@@ -46,11 +46,24 @@ function BoardPage() {
   const router = useRouter();
   const qc = useQueryClient();
   const clearSelection = useSelectionStore(s => s.clearSelection);
+  const deselectItems = useSelectionStore(s => s.deselectItems);
   const [showAutomations, setShowAutomations] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Clear selection when switching boards
   useEffect(() => { clearSelection(); }, [boardId]);
+
+  // Deselect tasks/subitems that are no longer on this board (e.g. moved away by automation)
+  useEffect(() => {
+    const taskIds = new Set(data.tasks.map(t => t.id));
+    const subitemIds = new Set(data.subitems.map(s => s.id));
+    const { selectedTaskIds, selectedSubitemIds } = useSelectionStore.getState();
+    const staleTasks = [...selectedTaskIds].filter(id => !taskIds.has(id));
+    const staleSubitems = [...selectedSubitemIds].filter(id => !subitemIds.has(id));
+    if (staleTasks.length > 0 || staleSubitems.length > 0) {
+      deselectItems(staleTasks, staleSubitems);
+    }
+  }, [data]);
 
   // On load (and board switch), check whether any tasks already satisfy an
   // automation's trigger condition and fire pending actions (e.g. create missing
