@@ -13,6 +13,8 @@ type Task = typeof taskTable.$inferSelect;
 type Subitem = typeof subitemTable.$inferSelect;
 type Column = typeof columnTable.$inferSelect;
 
+const pendingSubitemNames = new Map<string, string>();
+
 interface SubitemTableProps {
   task: Task;
   subitems: Subitem[];
@@ -67,13 +69,43 @@ export function SubitemTable({ task, subitems, columns = [], boardId, groupColor
 
   async function handleAddSubitem() {
     const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
+    const tempId = `_new_${Date.now()}`;
+
+    // Show placeholder row immediately
+    qc.setQueryData(queryKey, (old: any) => {
+      if (!old) return old;
+      const placeholder: Subitem = {
+        id: tempId, taskId: task.id, name: '',
+        fields: {}, position: Date.now() + 1,
+        createdAt: new Date(), updatedAt: new Date(),
+      } as unknown as Subitem;
+      return { ...old, subitems: [...old.subitems, placeholder] };
+    });
+    setPendingFocusId(tempId);
+
     const sub = await orpcClient.task.createSubitem({ taskId: task.id });
+
     if (sub) {
-      qc.setQueryData(queryKey, (old: any) =>
-        old ? { ...old, subitems: [...old.subitems, sub] } : old
-      );
+      const typedName = pendingSubitemNames.get(tempId) ?? '';
+      pendingSubitemNames.delete(tempId);
+      const realSub = typedName ? { ...sub, name: typedName } : sub;
+
+      qc.setQueryData(queryKey, (old: any) => {
+        if (!old) return old;
+        return { ...old, subitems: old.subitems.map((s: Subitem) => s.id === tempId ? realSub : s) };
+      });
       setPendingFocusId(sub.id);
+
+      if (typedName) {
+        orpcClient.task.updateSubitem({ subitemId: sub.id, name: typedName }).catch(() => {});
+      }
+    } else {
+      pendingSubitemNames.delete(tempId);
+      qc.setQueryData(queryKey, (old: any) =>
+        old ? { ...old, subitems: old.subitems.filter((s: Subitem) => s.id !== tempId) } : old
+      );
     }
+
     invalidate();
   }
 
@@ -285,6 +317,11 @@ function SubitemRow({ subitem, columns, boardId, autoFocus, onFocused,
   }, [autoFocus]);
 
   function handleNameChange(name: string) {
+    // Placeholder subitems aren't on the server yet — just buffer the name
+    if (subitem.id.startsWith('_new_')) {
+      pendingSubitemNames.set(subitem.id, name);
+      return;
+    }
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(async () => {
       await orpcClient.task.updateSubitem({ subitemId: subitem.id, name });
