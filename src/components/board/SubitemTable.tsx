@@ -66,8 +66,14 @@ export function SubitemTable({ task, subitems, columns = [], boardId, groupColor
   }
 
   async function handleAddSubitem() {
+    const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
     const sub = await orpcClient.task.createSubitem({ taskId: task.id });
-    if (sub) setPendingFocusId(sub.id);
+    if (sub) {
+      qc.setQueryData(queryKey, (old: any) =>
+        old ? { ...old, subitems: [...old.subitems, sub] } : old
+      );
+      setPendingFocusId(sub.id);
+    }
     invalidate();
   }
 

@@ -60,8 +60,14 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
   }
 
   async function handleAddTask() {
+    const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
     const task = await orpcClient.task.createTask({ groupId: group.id });
-    if (task) setPendingFocusId(task.id);
+    if (task) {
+      qc.setQueryData(queryKey, (old: any) =>
+        old ? { ...old, tasks: [...old.tasks, task] } : old
+      );
+      setPendingFocusId(task.id);
+    }
     invalidate();
   }
 
