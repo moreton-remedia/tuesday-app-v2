@@ -17,6 +17,9 @@ type Task = typeof taskTable.$inferSelect;
 type Subitem = typeof subitemTable.$inferSelect;
 type Column = typeof columnTable.$inferSelect;
 
+// Tracks names typed into placeholder rows before the server assigns a real ID
+const pendingTaskNames = new Map<string, string>();
+
 interface GroupSectionProps {
   group: Group;
   tasks: Task[];
@@ -61,13 +64,47 @@ export function GroupSection({ group, tasks, subitems = [], columns = [], subite
 
   async function handleAddTask() {
     const queryKey = orpcUtils.board.getBoardData.queryOptions({ input: { boardId } }).queryKey;
+    const tempId = `_new_${Date.now()}`;
+
+    // Show an empty placeholder row immediately
+    qc.setQueryData(queryKey, (old: any) => {
+      if (!old) return old;
+      const placeholder: Task = {
+        id: tempId, groupId: group.id, name: '',
+        fields: {}, expanded: 0, position: Date.now() + 1,
+        createdAt: new Date(), updatedAt: new Date(),
+      } as unknown as Task;
+      return { ...old, tasks: [...old.tasks, placeholder] };
+    });
+    setPendingFocusId(tempId);
+
     const task = await orpcClient.task.createTask({ groupId: group.id });
+
     if (task) {
-      qc.setQueryData(queryKey, (old: any) =>
-        old ? { ...old, tasks: [...old.tasks, task] } : old
-      );
+      // Carry over any name the user typed while waiting
+      const typedName = pendingTaskNames.get(tempId) ?? '';
+      pendingTaskNames.delete(tempId);
+      const realTask = typedName ? { ...task, name: typedName } : task;
+
+      // Replace placeholder with the real task (preserving typed name)
+      qc.setQueryData(queryKey, (old: any) => {
+        if (!old) return old;
+        return { ...old, tasks: old.tasks.map((t: Task) => t.id === tempId ? realTask : t) };
+      });
       setPendingFocusId(task.id);
+
+      // Persist typed name to server
+      if (typedName) {
+        orpcClient.task.updateTask({ taskId: task.id, name: typedName }).catch(() => {});
+      }
+    } else {
+      // Remove placeholder on failure
+      pendingTaskNames.delete(tempId);
+      qc.setQueryData(queryKey, (old: any) =>
+        old ? { ...old, tasks: old.tasks.filter((t: Task) => t.id !== tempId) } : old
+      );
     }
+
     invalidate();
   }
 
@@ -463,8 +500,13 @@ function TaskRow({ task, columns, subitems, subitemColumns, boardId, allBoardTas
   }
 
   function handleNameChange(name: string) {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     pendingNameRef.current = name;
+    // Placeholder rows aren't on the server yet — just buffer the name
+    if (task.id.startsWith('_new_')) {
+      pendingTaskNames.set(task.id, name);
+      return;
+    }
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(async () => {
       const trimmed = name.trim();
       if (trimmed && allBoardTasks) {
