@@ -524,6 +524,7 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [draft, setDraft] = useState('');
   const [suggestions, setSuggestions] = useState<MapsSuggestion[]>([]);
+  const [confirmedAddr, setConfirmedAddr] = useState<string | null>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -532,14 +533,18 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
   function open() {
     setDraft(value);
     setSuggestions([]);
+    setConfirmedAddr(null);
     setAnchorRect(triggerRef.current?.getBoundingClientRect() ?? null);
   }
 
   function close() {
-    const v = draft.trim();
-    if (v !== value) onChange(v);
+    if (!confirmedAddr) {
+      const v = draft.trim();
+      if (v !== value) onChange(v);
+    }
     setAnchorRect(null);
     setSuggestions([]);
+    setConfirmedAddr(null);
     sessionTokenRef.current = null;
   }
 
@@ -566,10 +571,17 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
     const place = s.placePrediction.toPlace();
     await place.fetchFields({ fields: ['formattedAddress'] });
     const addr: string = place.formattedAddress ?? '';
-    if (addr) { onChange(addr); }
+    if (addr) {
+      onChange(addr);
+      setDraft(addr);
+    }
     setSuggestions([]);
-    setAnchorRect(null);
     sessionTokenRef.current = null;
+    if (addr && onSetTaskName) {
+      setConfirmedAddr(addr);
+    } else {
+      setAnchorRect(null);
+    }
   }
 
   useEffect(() => {
@@ -597,66 +609,95 @@ function LocationCell({ value, onChange, onSetTaskName }: { value: string; onCha
       {anchorRect && (
         <CellPopover anchorRect={anchorRect} onClose={close} width={300}>
           <div className="p-2">
-            <input
-              value={draft}
-              onChange={e => handleInput(e.target.value)}
-              autoFocus
-              placeholder={MAPS_API_KEY ? 'Search for an address…' : 'Enter an address…'}
-              className="w-full bg-transparent text-sm text-app-t1 outline-none placeholder-app-t3/50 px-1 py-1"
-              onKeyDown={e => {
-                if (e.key === 'Escape') setAnchorRect(null);
-                if (e.key === 'Enter') {
-                  if (suggestions.length > 0) selectSuggestion(suggestions[0]);
-                  else close();
-                }
-              }}
-            />
-            {suggestions.length > 0 && (
-              <div className="mt-1 border-t border-app-ln/60 pt-1">
-                {suggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    onMouseDown={e => e.preventDefault()}
-                    onClick={() => selectSuggestion(s)}
-                    className="w-full text-left px-2 py-1.5 text-xs text-app-t2 hover:bg-app-s3 rounded flex items-center gap-2"
-                  >
-                    <span className="text-app-t3 flex-shrink-0">
-                      <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    </span>
-                    <span className="truncate">{s.placePrediction.text.text}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-            {(draft.trim() || value) && (
-              <div className="mt-1 border-t border-app-ln/60 pt-1 space-y-0.5">
-                {onSetTaskName && (
+            {confirmedAddr ? (
+              <div className="space-y-2 py-1">
+                <p className="text-xs text-app-t3 px-1">Use as task title?</p>
+                <p className="text-xs font-medium text-app-t1 px-1 truncate">{confirmedAddr.split(',')[0].trim()}</p>
+                <div className="flex gap-1.5 pt-0.5">
                   <button
                     onMouseDown={e => e.preventDefault()}
                     onClick={() => {
-                      const addr = draft.trim() || value;
-                      if (addr !== value) onChange(addr);
-                      onSetTaskName(addr.split(',')[0].trim());
+                      onSetTaskName!(confirmedAddr.split(',')[0].trim());
                       setAnchorRect(null);
-                      setSuggestions([]);
-                      sessionTokenRef.current = null;
+                      setConfirmedAddr(null);
                     }}
-                    className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t1 hover:bg-app-s3 rounded flex items-center gap-1.5"
+                    className="flex-1 px-2 py-1.5 text-xs bg-app-ac text-app-ac-tx rounded hover:opacity-90 font-medium"
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                    Use street as task title
+                    Yes, use as title
                   </button>
-                )}
-                {value && (
                   <button
                     onMouseDown={e => e.preventDefault()}
-                    onClick={() => { onChange(''); setAnchorRect(null); }}
-                    className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t2 hover:bg-app-s3 rounded"
+                    onClick={() => { setAnchorRect(null); setConfirmedAddr(null); }}
+                    className="flex-1 px-2 py-1.5 text-xs text-app-t2 hover:bg-app-s3 rounded border border-app-ln"
                   >
-                    Clear location
+                    Skip
                   </button>
-                )}
+                </div>
               </div>
+            ) : (
+              <>
+                <input
+                  value={draft}
+                  onChange={e => handleInput(e.target.value)}
+                  autoFocus
+                  placeholder={MAPS_API_KEY ? 'Search for an address…' : 'Enter an address…'}
+                  className="w-full bg-transparent text-sm text-app-t1 outline-none placeholder-app-t3/50 px-1 py-1"
+                  onKeyDown={e => {
+                    if (e.key === 'Escape') setAnchorRect(null);
+                    if (e.key === 'Enter') {
+                      if (suggestions.length > 0) selectSuggestion(suggestions[0]);
+                      else close();
+                    }
+                  }}
+                />
+                {suggestions.length > 0 && (
+                  <div className="mt-1 border-t border-app-ln/60 pt-1">
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => selectSuggestion(s)}
+                        className="w-full text-left px-2 py-1.5 text-xs text-app-t2 hover:bg-app-s3 rounded flex items-center gap-2"
+                      >
+                        <span className="text-app-t3 flex-shrink-0">
+                          <svg width="9" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        </span>
+                        <span className="truncate">{s.placePrediction.text.text}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {(draft.trim() || value) && (
+                  <div className="mt-1 border-t border-app-ln/60 pt-1 space-y-0.5">
+                    {onSetTaskName && (
+                      <button
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => {
+                          const addr = draft.trim() || value;
+                          if (addr !== value) onChange(addr);
+                          onSetTaskName(addr.split(',')[0].trim());
+                          setAnchorRect(null);
+                          setSuggestions([]);
+                          sessionTokenRef.current = null;
+                        }}
+                        className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t1 hover:bg-app-s3 rounded flex items-center gap-1.5"
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        Use street as task title
+                      </button>
+                    )}
+                    {value && (
+                      <button
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => { onChange(''); setAnchorRect(null); }}
+                        className="w-full text-left px-1 py-1 text-xs text-app-t3 hover:text-app-t2 hover:bg-app-s3 rounded"
+                      >
+                        Clear location
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </CellPopover>
